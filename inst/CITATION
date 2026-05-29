@@ -1,0 +1,14 @@
+bibentry(
+  bibtype = "Article",
+  title = "Identifying the Effect of Persuasion",
+  author = c(
+    person("Sung Jae", "Jun"),
+    person("Sokbae", "Lee")
+  ),
+  journal = "Journal of Political Economy",
+  year = "2023",
+  volume = "131",
+  number = "8",
+  pages = "2032--2058",
+  doi = "10.1086/724114"
+)

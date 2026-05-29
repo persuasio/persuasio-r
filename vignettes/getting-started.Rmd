@@ -1,0 +1,685 @@
+---
+title: "Getting Started with persuasio"
+author: "Xinrui Chen"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with persuasio}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## What is this for?
+
+This vignette shows the basic usage of the `persuasio` package for estimation
+and inference on average persuasion rates (APR) and local persuasion rates
+(LPR) in the potential-outcomes framework of Jun and Lee (2023).
+
+The package is designed for settings with a two-stage causal structure:
+
+$$Z_i \text{ (instrument)} \rightarrow T_i \text{ (exposure)} \rightarrow Y_i \text{ (outcome)}$$
+
+where $Z_i$ is a binary instrument, such as random assignment or policy
+eligibility; $T_i$ is actual exposure to a persuasive message, such as media
+consumption or campaign contact; and $Y_i$ is a binary behavioral outcome, such
+as voting, donating, or purchasing. For an overview of empirical settings that
+motivate persuasion estimands, see DellaVigna and Gentzkow (2010, *Annual
+Review of Economics*,
+[doi:10.1146/annurev.economics.102308.124309](https://doi.org/10.1146/annurev.economics.102308.124309)).
+
+### When is `persuasio` applicable?
+
+The framework applies whenever the empirical setting features:
+
+- **A binary or discretized outcome**: vote/not vote, donate/not donate.
+- **A persuasive channel**: media exposure, information shocks, campaigns, or
+  policy eligibility.
+- **A credible instrument**: randomized controlled trial assignment or a
+  quasi-random rollout.
+- **Imperfect compliance**: not everyone assigned receives treatment, or some
+  untreated units still receive exposure.
+
+The richest case uses individual-level data on $(Y, T, Z)$. Some estimands can
+also be computed when only $(Y, Z)$ are observed, or when only summary
+statistics are available.
+
+### Key estimands
+
+- **Average Persuasion Rate (APR)**: the population-wide persuasion rate. It is
+  analogous to the average treatment effect (ATE), and is generally partially
+  identified and reported as sharp bounds.
+- **Local Persuasion Rate (LPR)**: the persuasion rate among compliers, the
+  subpopulation for whom $Z_i$ changes $T_i$. It is analogous to the local
+  average treatment effect (LATE) in the instrumental variables literature.
+
+## `persuasio` TL;DR
+
+`persuasio` is the recommended function for all estimation and inference. The
+lower-level functions (`aprlb`, `aprub`, `lpr4ytz`, and `calc4persuasio`) are
+available for direct access when only a specific component is needed.
+
+### Choosing an estimator (`est`) in `persuasio`
+
+| Situation                                      | `est` argument |
+|------------------------------------------------|----------------|
+| APR bounds + CI, have treatment variable       | `"apr"`        |
+| LPR point estimate + CI                        | `"lpr"`        |
+| APR bounds + CI, only outcome and instrument   | `"yz"`         |
+| Bounds from summary statistics                 | `"calc"`       |
+
+### Choosing an inference method in `persuasio`
+
+| Situation                             | Recommended `method` |
+|---------------------------------------|----------------------|
+| No covariates, large sample           | `"normal"`           |
+| Covariates present                    | `"bootstrap"`        |
+| Small sample regardless of covariates | `"bootstrap"`        |
+
+### Choosing a model in `persuasio` when covariates are present
+
+| Identifying assumption                                 | `model`             |
+|--------------------------------------------------------|---------------------|
+| Homogeneous covariate effects across instrument groups | `"no_interaction"`  |
+| Heterogeneous covariate effects across groups          | `"interaction"`     |
+| Unsure                                                 | `"no_interaction"`  |
+
+### Package setup
+
+```{r setup}
+library(persuasio)
+```
+
+The `GKB` data set is included in `persuasio` as lazy data, so it is available
+after loading the package.
+
+## `persuasio`: Unified Wrapper for Persuasion Effect Estimation
+
+`persuasio` is the recommended entry point for the package. Rather than calling
+`aprlb`, `aprub`, `lpr4ytz`, or `calc4persuasio` directly, `persuasio` provides
+a single interface that handles input parsing and dispatches to the correct
+estimator based on the `est` argument.
+
+### Argument overview
+
+| Argument  | Purpose                                                        | Default              |
+|-----------|----------------------------------------------------------------|----------------------|
+| `est`     | Which estimand to target (`"apr"`, `"lpr"`, `"yz"`, `"calc"`)  | Required             |
+| `varlist` | Variable names in estimator-specific order                     | Required             |
+| `data`    | Data frame                                                     | Required             |
+| `level`   | Confidence level                                               | `0.95`               |
+| `model`   | `"no_interaction"` or `"interaction"`                          | `"no_interaction"`   |
+| `method`  | `"normal"` or `"bootstrap"`                                    | `"normal"`           |
+| `nboot`   | Bootstrap replications, only when `method = "bootstrap"`       | `50`                 |
+
+### `varlist` ordering
+
+For `est = "apr"`, `"lpr"`, and `"calc"`, variables must be supplied in the
+order `c(y, t, z, x, ...)`. For `est = "yz"`, where the treatment variable is
+not observed, use `c(y, z, x, ...)`.
+
+### Examples using the GKB dataset
+
+**Example 1: Average persuasion rate (APR)**
+
+```{r}
+persuasio(
+  est     = "apr",
+  varlist = c("voteddem_all", "readsome", "post"),
+  data    = GKB,
+  level   = 0.80,
+  method  = "normal"
+)
+```
+
+This dispatches to `aprlb` and `aprub` to produce lower and upper bounds on the
+APR with asymptotic normal confidence intervals at the 80% level.
+
+**Example 2: Local persuasion rate (LPR)**
+
+```{r}
+persuasio(
+  est     = "lpr",
+  varlist = c("voteddem_all", "readsome", "post"),
+  data    = GKB,
+  level   = 0.80,
+  method  = "normal"
+)
+```
+
+This dispatches to `lpr4ytz` to estimate the persuasion effect among compliers
+and returns standard errors and confidence intervals under the normal
+approximation.
+
+**Example 3: Outcome-instrument bounds with a covariate and bootstrap**
+
+```{r, eval = FALSE}
+persuasio(
+  est     = "yz",
+  varlist = c("voteddem_all", "post", "MZwave2"),
+  data    = GKB,
+  level   = 0.80,
+  model   = "interaction",
+  method  = "bootstrap",
+  nboot   = 1000
+)
+```
+
+The `"yz"` estimator uses only the outcome and instrument, making it suitable
+when the treatment variable is not observed. `MZwave2` is passed as a covariate
+with `model = "interaction"`, allowing heterogeneous covariate effects across
+instrument groups. The example uses 1,000 bootstrap replications for applied
+work and is not evaluated during vignette building.
+
+## Base estimators
+
+This section details the lower-level functions in `persuasio`.
+
+| Situation                                      | Base function       |
+|------------------------------------------------|---------------------|
+| Lower bound on APR only                        | `aprlb`             |
+| Upper bound on APR only                        | `aprub`             |
+| Local persuasion rate (LPR) for compliers      | `lpr4ytz`           |
+| Bounds from published group means, no microdata | `calc4persuasio`    |
+
+### `calc4persuasio`: Bounds from Summary Statistics
+
+`calc4persuasio` computes lower and upper bounds on persuasion rates directly
+from group means by instrument status. This function is useful when only
+published summary statistics are available, or as a quick sanity check against
+`aprlb` and `aprub`.
+
+The function uses:
+
+| Argument | Meaning                                            |
+|----------|----------------------------------------------------|
+| `y1`     | Mean of binary outcome `y` when instrument `z = 1` |
+| `y0`     | Mean of binary outcome `y` when instrument `z = 0` |
+| `e1`     | Mean of binary treatment `t` when instrument `z = 1` |
+| `e0`     | Mean of binary treatment `t` when instrument `z = 0` |
+
+#### Examples using the GKB dataset
+
+Since `calc4persuasio` works on summary statistics, we first compute group
+means manually:
+
+```{r}
+voteddem_all_0 <- mean(GKB$voteddem_all[GKB$post == 0], na.rm = TRUE)
+voteddem_all_1 <- mean(GKB$voteddem_all[GKB$post == 1], na.rm = TRUE)
+
+readsome_0 <- mean(GKB$readsome[GKB$post == 0], na.rm = TRUE)
+readsome_1 <- mean(GKB$readsome[GKB$post == 1], na.rm = TRUE)
+```
+
+Then pass them to `calc4persuasio`:
+
+```{r}
+calc4persuasio(
+  y1 = voteddem_all_1,
+  y0 = voteddem_all_0,
+  e1 = readsome_1,
+  e0 = readsome_0
+)
+```
+
+### `aprlb`: Lower Bound on the Average Persuasion Rate
+
+`aprlb` estimates the lower bound on the average persuasion rate (APR)
+following Jun and Lee (2023).
+
+The function requires:
+
+| Argument | Role                  | Must be binary? |
+|----------|-----------------------|-----------------|
+| `y`      | Outcome               | Yes             |
+| `z`      | Instrument            | Yes             |
+| `x`      | Covariates, optional  | No              |
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates**
+
+```{r}
+aprlb(data = GKB, y = "voteddem_all", z = "post")
+```
+
+This estimates the lower bound without covariates, returning a coefficient,
+standard error, and 95% confidence interval.
+
+**Example 2: With a covariate, no-interaction model**
+
+```{r}
+aprlb(data = GKB, y = "voteddem_all", z = "post", x = "MZwave2")
+```
+
+With covariates and the default `model = "no_interaction"`, the function fits a
+single regression with the instrument and covariates. Analytical standard
+errors are not reported in this case; use a bootstrap wrapper for inference.
+
+**Example 3: By subgroup**
+
+```{r}
+gkb_groups <- split(GKB, GKB$MZwave2)
+lapply(gkb_groups, function(sub_data) {
+  aprlb(data = sub_data, y = "voteddem_all", z = "post")
+})
+```
+
+This example computes `aprlb` separately for each value of `MZwave2` without
+covariates, producing estimates with standard errors for each subgroup.
+
+### `aprub`: Upper Bound on the Average Persuasion Rate
+
+`aprub` estimates the upper bound on the average persuasion rate (APR) following
+Jun and Lee (2023).
+
+The function requires:
+
+| Argument | Role                  | Must be binary? |
+|----------|-----------------------|-----------------|
+| `y`      | Outcome               | Yes             |
+| `t`      | Treatment             | Yes             |
+| `z`      | Instrument            | Yes             |
+| `x`      | Covariates, optional  | No              |
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates**
+
+```{r}
+aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post")
+```
+
+Without covariates, `aprub` estimates the upper bound directly from the data
+and returns a coefficient, standard error, and 95% confidence interval.
+
+**Example 2: With a covariate, no-interaction model**
+
+```{r}
+aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post", x = "MZwave2")
+```
+
+With covariates and the default `model = "no_interaction"`, the function fits
+single regressions with the instrument and covariates. Analytical standard
+errors are not reported in this case; use a bootstrap wrapper for inference.
+
+**Example 3: By subgroup**
+
+```{r}
+gkb_groups <- split(GKB, GKB$MZwave2)
+lapply(gkb_groups, function(sub_data) {
+  aprub(data = sub_data, y = "voteddem_all", t = "readsome", z = "post")
+})
+```
+
+This example computes the no-covariate `aprub` estimates within each level of
+`MZwave2`, returning estimates with standard errors for each subgroup.
+
+### `lpr4ytz`: Local Persuasion Rate
+
+`lpr4ytz` estimates the local persuasion rate (LPR), the average persuasion
+effect among compliers. While `aprlb` and `aprub` bound the APR across the full
+population, the LPR focuses on the complier subpopulation.
+
+The function requires:
+
+| Argument | Role                  | Must be binary? |
+|----------|-----------------------|-----------------|
+| `y`      | Outcome               | Yes             |
+| `t`      | Treatment             | Yes             |
+| `z`      | Instrument            | Yes             |
+| `x`      | Covariates, optional  | No              |
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates**
+
+```{r}
+lpr4ytz(
+  data = GKB,
+  y    = "voteddem_all",
+  t    = "readsome",
+  z    = "post"
+)
+```
+
+Without covariates, `lpr4ytz` returns the LPR estimate along with a standard
+error and 95% confidence interval.
+
+**Example 2: With a covariate, no-interaction model**
+
+```{r}
+lpr4ytz(
+  data = GKB,
+  y    = "voteddem_all",
+  t    = "readsome",
+  z    = "post",
+  x    = "MZwave2"
+)
+```
+
+The default `model = "no_interaction"` fits single regressions with the
+instrument and covariates. This is a parsimonious specification and is
+appropriate when there is no strong prior reason to expect heterogeneous
+covariate effects.
+
+**Example 3: With a covariate, interaction model**
+
+```{r}
+lpr4ytz(
+  data  = GKB,
+  y     = "voteddem_all",
+  t     = "readsome",
+  z     = "post",
+  x     = "MZwave2",
+  model = "interaction"
+)
+```
+
+The `model = "interaction"` specification fits separate models by instrument
+group, allowing the effect of `MZwave2` to differ between the `z = 1` and
+`z = 0` subgroups. Analytical standard errors are not reported in this case.
+
+## Inference wrappers
+
+| Situation                                   | Function               |
+|---------------------------------------------|------------------------|
+| APR bounds + CI, with treatment variable    | `persuasio4ytz`        |
+| APR bounds + CI, only outcome and instrument| `persuasio4yz`         |
+| LPR point estimate + CI                     | `persuasio4ytz2lpr`    |
+
+Each inference wrapper calls the corresponding base function(s) for point
+estimation, then adds confidence intervals via the chosen inference `method`:
+
+- `persuasio4ytz` calls `aprlb` and `aprub` jointly, combining the two bounds
+  into a single interval using either a Stoye (2009) normal correction or
+  bootstrap resampling.
+- `persuasio4yz` uses only the reduced-form relationship between outcome and
+  instrument; the upper bound is fixed at 1.
+- `persuasio4ytz2lpr` calls `lpr4ytz` for the LPR point estimate and wraps it
+  with a standard normal or bootstrap confidence interval.
+
+In all three cases, `persuasio` is the recommended entry point and dispatches to
+the appropriate wrapper internally. Call the wrappers directly only when finer
+control over arguments is needed.
+
+### `persuasio4ytz`: Confidence Intervals for the Average Persuasion Rate
+
+When `est = "apr"` in `persuasio`, `persuasio4ytz` is working under the hood. It
+combines lower and upper bound estimates from `aprlb` and `aprub` into a single
+confidence interval, using either an asymptotic normal approximation or
+bootstrap resampling.
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates, asymptotic normal approximation**
+
+```{r}
+persuasio4ytz(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+The asymptotic normal method is appropriate here because no covariates are
+present and analytical standard errors are available from both `aprlb` and
+`aprub`.
+
+**Example 2: No covariates, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4ytz(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+Bootstrap inference with 1,000 replications provides an alternative to the
+normal approximation. Results should be close to Example 1 in large samples.
+The default `nboot = 50` is suitable only for quick checks.
+
+**Example 3: With a covariate, interaction model, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4ytz(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  x      = "MZwave2",
+  model  = "interaction",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+When covariates are present, bootstrap inference is recommended. Under
+`model = "interaction"`, it is required because analytical standard errors are
+not reported. The interaction specification allows heterogeneous covariate
+effects across the `z = 1` and `z = 0` subgroups.
+
+#### Relationship to `persuasio`
+
+```{r eval = FALSE}
+# These two calls are equivalent
+persuasio(
+  est     = "apr",
+  varlist = c("voteddem_all", "readsome", "post"),
+  data    = GKB,
+  level   = 0.80,
+  method  = "normal"
+)
+
+persuasio4ytz(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+### `persuasio4ytz2lpr`: Confidence Intervals for the Local Persuasion Rate
+
+When `est = "lpr"` in `persuasio`, `persuasio4ytz2lpr` is working under the
+hood. It is the inference companion to `lpr4ytz`, wrapping the LPR point
+estimate and adding confidence intervals via either a delta-method normal
+approximation or bootstrap resampling.
+
+With covariates, bootstrap inference is recommended. It is required when
+analytical standard errors are unavailable, especially under interaction
+models.
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates, normal inference**
+
+```{r}
+persuasio4ytz2lpr(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+The function uses the delta-method standard error from `lpr4ytz` to construct an
+80% confidence interval under the normal approximation.
+
+**Example 2: No covariates, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4ytz2lpr(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+Bootstrap inference with 1,000 replications provides an alternative to the
+normal approximation. The default `nboot = 50` is only appropriate for quick
+checks.
+
+**Example 3: With a covariate, interaction model, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4ytz2lpr(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  x      = "MZwave2",
+  model  = "interaction",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+The `model = "interaction"` specification allows the effect of `MZwave2` to
+differ between the `z = 1` and `z = 0` subgroups. Bootstrap inference is used
+because analytical standard errors are not reported in this case.
+
+#### Relationship to `persuasio`
+
+```{r eval = FALSE}
+# These two calls are equivalent
+persuasio(
+  est     = "lpr",
+  varlist = c("voteddem_all", "readsome", "post"),
+  data    = GKB,
+  level   = 0.80,
+  method  = "normal"
+)
+
+persuasio4ytz2lpr(
+  data   = GKB,
+  y      = "voteddem_all",
+  t      = "readsome",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+### `persuasio4yz`: APR Bounds Without a Treatment Variable
+
+When `est = "yz"` in `persuasio`, `persuasio4yz` is working under the hood. It
+estimates bounds on the APR using only the binary outcome `y` and binary
+instrument `z`, and is appropriate when only the outcome and instrument are
+observed.
+
+### When to use `persuasio4yz` vs `persuasio4ytz`
+
+| Function        | Variables needed | Estimand             | Use when                         |
+|-----------------|------------------|----------------------|----------------------------------|
+| `persuasio4ytz` | `y`, `t`, `z`    | APR, tighter bounds  | Treatment variable is observed   |
+| `persuasio4yz`  | `y`, `z`         | APR, wider bounds    | Only outcome and instrument are observed |
+
+#### Examples using the GKB dataset
+
+**Example 1: No covariates, normal inference**
+
+```{r}
+persuasio4yz(
+  data   = GKB,
+  y      = "voteddem_all",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+Without covariates, the lower-bound analytical standard error is available from
+`aprlb`; the upper bound is fixed at 1. The normal approximation gives a
+one-sided confidence interval for the identified set.
+
+**Example 2: No covariates, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4yz(
+  data   = GKB,
+  y      = "voteddem_all",
+  z      = "post",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+Bootstrap inference resamples the lower-bound estimator. The default
+`nboot = 50` is only appropriate for quick checks.
+
+**Example 3: With a covariate, interaction model, bootstrap inference**
+
+```{r, eval = FALSE}
+persuasio4yz(
+  data   = GKB,
+  y      = "voteddem_all",
+  z      = "post",
+  x      = "MZwave2",
+  model  = "interaction",
+  method = "bootstrap",
+  level  = 0.80,
+  nboot  = 1000
+)
+```
+
+With covariates, bootstrap inference is recommended. The
+`model = "interaction"` specification allows heterogeneous covariate effects of
+`MZwave2` across instrument groups.
+
+#### Relationship to `persuasio`
+
+```{r eval = FALSE}
+# These two calls are equivalent
+persuasio(
+  est     = "yz",
+  varlist = c("voteddem_all", "post"),
+  data    = GKB,
+  level   = 0.80,
+  method  = "normal"
+)
+
+persuasio4yz(
+  data   = GKB,
+  y      = "voteddem_all",
+  z      = "post",
+  method = "normal",
+  level  = 0.80
+)
+```
+
+## Related Software
+
+The original Stata implementation is available at
+<https://github.com/persuasio/persuasio-stata>.
+
+## Reference
+
+Jun, Sung Jae, and Sokbae Lee. 2023. "Identifying the Effect of Persuasion."
+*Journal of Political Economy* 131 (8): 2032-2058.
+<https://doi.org/10.1086/724114>.

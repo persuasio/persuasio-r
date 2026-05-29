@@ -1,0 +1,25 @@
+# R session artifacts
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.positai
+
+# R build/check outputs
+*.o
+*.so
+*.dll
+*.Rout
+*.Rcheck/
+
+# Compiled vignettes and pkgdown site (build locally, don't commit)
+inst/doc
+vignettes/*.html
+vignettes/*.pdf
+docs/
+
+# CRAN submission
+*.tar.gz
+
+# macOS
+.DS_Store
