@@ -64,6 +64,51 @@ test_that("calc4persuasio enforces [0,1] bounds", {
   )
 })
 
+# 4b. error messages include a space between variable name and "must be binary"
+#     These tests fail with the current code (paste0(y, "must be binary"))
+#     and pass once the fix (paste0(y, " must be binary")) is applied.
+
+test_that("aprlb error message has space before 'must be binary'", {
+
+  df_bad <- df
+  df_bad$y[1] <- 2
+
+  expect_error(
+    aprlb(df_bad, "y", "z"),
+    "y must be binary"
+  )
+
+  df_bad2 <- df
+  df_bad2$z[1] <- 2
+
+  expect_error(
+    aprlb(df_bad2, "y", "z"),
+    "z must be binary"
+  )
+})
+
+test_that("aprub error message has space before 'must be binary'", {
+
+  df_bad <- df
+  df_bad$t[1] <- 3
+
+  expect_error(
+    aprub(df_bad, "y", "t", "z"),
+    "t must be binary"
+  )
+})
+
+test_that("lpr4ytz error message has space before 'must be binary'", {
+
+  df_bad <- df
+  df_bad$z[1] <- 9
+
+  expect_error(
+    lpr4ytz(df_bad, "y", "t", "z"),
+    "z must be binary"
+  )
+})
+
 # 5. invalid model argument
 test_that("aprlb handles invalid model argument", {
 

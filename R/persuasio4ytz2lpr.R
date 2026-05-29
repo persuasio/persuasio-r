@@ -166,15 +166,15 @@ persuasio4ytz2lpr <- function(data, y, t, z, x = NULL,
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
 
-      r <- try(lpr4ytz(d_b, y, t, z, x, model), silent = TRUE)
+      r <- suppressWarnings(try(lpr4ytz(d_b, y, t, z, x, model), silent = TRUE))
 
       boot[b] <- if (inherits(r, "try-error")) NA else r$lpr
     }
 
     boot <- boot[!is.na(boot)]
 
-    ci_lb <- quantile(boot, probs = alpha / 2)
-    ci_ub <- quantile(boot, probs = 1 - alpha / 2)
+    ci_lb <- max(0, quantile(boot, probs = alpha / 2))
+    ci_ub <- min(1, quantile(boot, probs = 1 - alpha / 2))
 
     res <- list(
       lpr = lpr_coef,

@@ -108,9 +108,12 @@ persuasio4ytz <- function(data, y, t, z, x = NULL,
                           level = 0.95,
                           nboot = 50,
                           title = NULL,
-                          subset = NULL) {
+                          subset = NULL,
+                          seed = NULL) {
 
   method <- match.arg(method, c("normal", "bootstrap"))
+
+  if (!is.null(seed)) set.seed(seed)
 
   # subset handling
   if (!is.null(subset)) {
@@ -143,12 +146,6 @@ persuasio4ytz <- function(data, y, t, z, x = NULL,
 
     correction <- (ub_coef - lb_coef) / max(lb_se, ub_se)
 
-    grid <- seq(cv1 - 0.01, cv2 + 0.01, length.out = n)
-
-    loss <- abs(
-      pnorm(grid + correction) - pnorm(-grid) - (1 - alpha)
-    )
-
     objective <- function(c) {
       abs(pnorm(c + correction) - pnorm(-c) - (1 - alpha))
     }
@@ -178,23 +175,24 @@ persuasio4ytz <- function(data, y, t, z, x = NULL,
     return(res)
   }
 
-  # Case 2: Bootstrap
+  # Case 2: Bootstrap — separate independent loops for lb and ub,
+  # matching the Stata implementation which runs two independent
+  # bootstrap calls (one for aprlb, one for aprub).
   if (method == "bootstrap") {
 
-    set.seed(NULL)
-
     lb_boot <- numeric(nboot)
-    ub_boot <- numeric(nboot)
-
     for (b in seq_len(nboot)) {
-
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
-
-      lb_b <- try(aprlb(d_b, y, z, x, model), silent = TRUE)
-      ub_b <- try(aprub(d_b, y, t, z, x, model), silent = TRUE)
-
+      lb_b <- suppressWarnings(try(aprlb(d_b, y, z, x, model), silent = TRUE))
       lb_boot[b] <- if (inherits(lb_b, "try-error")) NA else lb_b$lb_coef
+    }
+
+    ub_boot <- numeric(nboot)
+    for (b in seq_len(nboot)) {
+      idx <- sample(seq_len(n), size = n, replace = TRUE)
+      d_b <- data[idx, , drop = FALSE]
+      ub_b <- suppressWarnings(try(aprub(d_b, y, t, z, x, model), silent = TRUE))
       ub_boot[b] <- if (inherits(ub_b, "try-error")) NA else ub_b$ub_coef
     }
 

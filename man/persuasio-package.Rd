@@ -7,14 +7,23 @@
 \description{
 A package for persuasion rate estimation.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/persuasio/persuasio-r}
+  \item \url{https://github.com/persuasio/persuasio-stata}
+  \item Report bugs at \url{https://github.com/persuasio/persuasio-r/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: Xinrui Chen \email{xc2731@columbia.edu} (R implementation of the Stata package with the same name)
+\strong{Maintainer}: Sokbae Lee \email{sl3841@columbia.edu}
 
 Authors:
 \itemize{
-  \item Xinrui Chen \email{xc2731@columbia.edu} (R implementation of the Stata package with the same name)
-  \item Sung Jae Jun \email{suj14@psu.edu}
   \item Sokbae Lee \email{sl3841@columbia.edu}
+  \item Xinrui Chen \email{xc2731@columbia.edu}
+  \item Sung Jae Jun \email{suj14@psu.edu}
 }
 
 }

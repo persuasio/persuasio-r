@@ -80,9 +80,9 @@ lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
   t_vec <- data[[t]]
   z_vec <- data[[z]]
 
-  if (!all(y_vec %in% c(0,1))) stop(paste0(y, "must be binary"))
-  if (!all(t_vec %in% c(0,1))) stop(paste0(t, "must be binary"))
-  if (!all(z_vec %in% c(0,1))) stop(paste0(z, "must be binary"))
+  if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
+  if (!all(t_vec %in% c(0,1))) stop(paste0(t, " must be binary"))
+  if (!all(z_vec %in% c(0,1))) stop(paste0(z, " must be binary"))
 
   # lpr denominator
   data$den_lpr <- (1 - y_vec) * (1 - t_vec)
@@ -146,8 +146,8 @@ lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
     # 95% CI
     z_score <- qnorm(0.975)
 
-    ci_lb <- lpr - z_score * se
-    ci_ub <- lpr + z_score * se
+    ci_lb <- max(0, lpr - z_score * se)
+    ci_ub <- min(1, lpr + z_score * se)
 
     res <- list(
       lpr = as.numeric(unlist(lpr)),
