@@ -15,7 +15,8 @@ persuasio4ytz(
   level = 0.95,
   nboot = 50,
   title = NULL,
-  subset = NULL
+  subset = NULL,
+  seed = NULL
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ persuasio4ytz(
 \item{title}{optional title for printed output}
 
 \item{subset}{optional index or logical vector for subsetting data}
+
+\item{seed}{optional integer random seed for bootstrap reproducibility}
 }
 \value{
 An object of class \code{persuasio4ytz} containing:

@@ -159,7 +159,7 @@ approximation.
 
 **Example 3: Outcome-instrument bounds with a covariate and bootstrap**
 
-```{r, eval = FALSE}
+```{r}
 persuasio(
   est     = "yz",
   varlist = c("voteddem_all", "post", "MZwave2"),
@@ -167,15 +167,15 @@ persuasio(
   level   = 0.80,
   model   = "interaction",
   method  = "bootstrap",
-  nboot   = 1000
+  nboot   = 100
 )
 ```
 
 The `"yz"` estimator uses only the outcome and instrument, making it suitable
 when the treatment variable is not observed. `MZwave2` is passed as a covariate
 with `model = "interaction"`, allowing heterogeneous covariate effects across
-instrument groups. The example uses 1,000 bootstrap replications for applied
-work and is not evaluated during vignette building.
+instrument groups. One hundred bootstrap replications are used here for
+computational efficiency; at least 1,000 are recommended for applied research.
 
 ## Base estimators
 
@@ -437,7 +437,7 @@ present and analytical standard errors are available from both `aprlb` and
 
 **Example 2: No covariates, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4ytz(
   data   = GKB,
   y      = "voteddem_all",
@@ -445,17 +445,18 @@ persuasio4ytz(
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 
-Bootstrap inference with 1,000 replications provides an alternative to the
-normal approximation. Results should be close to Example 1 in large samples.
-The default `nboot = 50` is suitable only for quick checks.
+Bootstrap inference provides an alternative to the normal approximation; results
+should be close to Example 1 in large samples. One hundred replications are used
+here for computational efficiency; at least 1,000 are recommended for applied
+research.
 
 **Example 3: With a covariate, interaction model, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4ytz(
   data   = GKB,
   y      = "voteddem_all",
@@ -465,7 +466,7 @@ persuasio4ytz(
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 
@@ -527,7 +528,7 @@ The function uses the delta-method standard error from `lpr4ytz` to construct an
 
 **Example 2: No covariates, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4ytz2lpr(
   data   = GKB,
   y      = "voteddem_all",
@@ -535,17 +536,17 @@ persuasio4ytz2lpr(
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 
-Bootstrap inference with 1,000 replications provides an alternative to the
-normal approximation. The default `nboot = 50` is only appropriate for quick
-checks.
+Bootstrap inference provides an alternative to the normal approximation. One
+hundred replications are used here for computational efficiency; at least 1,000
+are recommended for applied research.
 
 **Example 3: With a covariate, interaction model, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4ytz2lpr(
   data   = GKB,
   y      = "voteddem_all",
@@ -555,7 +556,7 @@ persuasio4ytz2lpr(
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 
@@ -619,23 +620,24 @@ one-sided confidence interval for the identified set.
 
 **Example 2: No covariates, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4yz(
   data   = GKB,
   y      = "voteddem_all",
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 
-Bootstrap inference resamples the lower-bound estimator. The default
-`nboot = 50` is only appropriate for quick checks.
+Bootstrap inference resamples the lower-bound estimator. One hundred
+replications are used here for computational efficiency; at least 1,000 are
+recommended for applied research.
 
 **Example 3: With a covariate, interaction model, bootstrap inference**
 
-```{r, eval = FALSE}
+```{r}
 persuasio4yz(
   data   = GKB,
   y      = "voteddem_all",
@@ -644,7 +646,7 @@ persuasio4yz(
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 100
 )
 ```
 

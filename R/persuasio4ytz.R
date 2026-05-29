@@ -30,6 +30,7 @@
 #' @param nboot number of bootstrap replications (default 50)
 #' @param title optional title for printed output
 #' @param subset optional index or logical vector for subsetting data
+#' @param seed optional integer random seed for bootstrap reproducibility
 #'
 #' @return An object of class \code{persuasio4ytz} containing:
 #' \describe{

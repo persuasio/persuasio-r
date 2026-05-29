@@ -9,6 +9,18 @@ Add new entries at the top. Format: date · function(s) · issue · status.
 
 ---
 
+## [2026-05-29] Undocumented seed argument in persuasio4ytz
+
+**Function:** `R/persuasio4ytz.R`, `man/persuasio4ytz.Rd`  
+**Issue:** The `seed` parameter added to `persuasio4ytz()` was missing its
+`@param` roxygen tag, causing `R CMD check` to report: *"Undocumented arguments
+in Rd file 'persuasio4ytz.Rd': 'seed'"*.  
+**Status:** Fixed — added `@param seed optional integer random seed for
+bootstrap reproducibility` to the roxygen block; `man/persuasio4ytz.Rd`
+regenerated via `devtools::document()`.
+
+---
+
 ## Open items for future review
 
 The following were identified but not yet addressed. Pick up in the next pass.
@@ -143,8 +155,9 @@ package issues).
 - Opening section rewritten to align with revised `DESCRIPTION`
 - Replaced source-tree data loading with lazy data (`GKB` available after
   `library(persuasio)`)
-- Applied bootstrap examples (`nboot = 1000`) marked `eval = FALSE` so CRAN
-  vignette build remains fast
+- Bootstrap examples use `nboot = 100` and are evaluated during vignette
+  build; surrounding prose notes that at least 1,000 replications are
+  recommended for applied research
 - Corrected wording for `yz` estimator, covariate models, inference wrappers,
   and standard-error availability
 - Added Related Software and Reference sections
