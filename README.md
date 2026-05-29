@@ -26,7 +26,8 @@ pak::pak("persuasio/persuasio-r")
 ## Related Software
 
 The original Stata implementation is available at
-<https://github.com/persuasio/persuasio-stata> and from SSC as `persuasio`.
+<https://github.com/persuasio/persuasio-stata> and from SSC as
+`persuasio`.
 
 ## Quick Example
 
@@ -79,7 +80,7 @@ persuasio(
 #> 
 #> Estimates:
 #>     LPR CI Lower CI Upper
-#>  0.8067   0.0409   1.8671
+#>  0.8067   0.0346        1
 #> 
 #> Confidence level: 80%
 #> Bootstrap replications: 1000
@@ -87,11 +88,12 @@ persuasio(
 
 ## Learn more
 
-See `vignette("getting-started", package = "persuasio")` for a full walkthrough including covariates,
-model specifications, and the relationship between estimands.
+See `vignette("getting-started", package = "persuasio")` for a full
+walkthrough including covariates, model specifications, and the
+relationship between estimands.
 
 ## Reference
 
-Jun, Sung Jae, and Sokbae Lee. 2023. "Identifying the Effect of Persuasion."
-*Journal of Political Economy* 131 (8): 2032-2058.
+Jun, Sung Jae, and Sokbae Lee. 2023. “Identifying the Effect of
+Persuasion.” *Journal of Political Economy* 131 (8): 2032-2058.
 <https://doi.org/10.1086/724114>.
