@@ -16,18 +16,6 @@ test_that("interaction model works", {
 
 })
 
-test_that("interaction model handles small subgroups", {
-  df_small <- data.frame(
-    y = c(1, 0, 1, 0),
-    t = c(1, 0, 1, 0),
-    z = c(1, 1, 0, 0),
-    x1 = c(1, 1, 1, 1)  # collinear covariate
-  )
-  expect_warning(
-    aprlb(y = "y", z = "z", x = "x1", model = "interaction", data = df_small)
-  )
-})
-
 test_that("interaction model warns on collinear covariates", {
   df_collinear <- data.frame(
     y  = c(1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0),
