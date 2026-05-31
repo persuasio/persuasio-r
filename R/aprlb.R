@@ -62,8 +62,8 @@ aprlb <- function(y, z, x = NULL, model = "no_interaction", data) {
   y_vec <- data[[y]]
   z_vec <- data[[z]]
 
-  if (anyNA(y_vec)) stop(y, " contains NA values. Remove or impute before calling.")
-  if (anyNA(z_vec)) stop(z, " contains NA values. Remove or impute before calling.")
+  if (anyNA(y_vec)) stop(paste0("remove or impute NA in ", y, " before proceeding. Must be binary."))
+  if (anyNA(z_vec)) stop(paste0("remove or impute NA in ", z, " before proceeding. Must be binary."))
 
   if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
   if (!all(z_vec %in% c(0,1))) stop(paste0(z, " must be binary"))
