@@ -88,3 +88,27 @@ test_that("wrapper estimators reject invalid inference methods", {
     "should be one of"
   )
 })
+
+test_that("aprlb gives clear error when y contains NA", {
+  df_na <- df
+  df_na$y[1] <- NA
+  expect_error(aprlb(y = "y", z = "z", data = df_na), "contains NA")
+})
+
+test_that("aprlb gives clear error when z contains NA", {
+  df_na <- df
+  df_na$z[1] <- NA
+  expect_error(aprlb(y = "y", z = "z", data = df_na), "contains NA")
+})
+
+test_that("aprub gives clear error when t contains NA", {
+  df_na <- df
+  df_na$t[1] <- NA
+  expect_error(aprub(y = "y", t = "t", z = "z", data = df_na), "contains NA")
+})
+
+test_that("lpr4ytz gives clear error when variables contain NA", {
+  df_na <- df
+  df_na$y[1] <- NA
+  expect_error(lpr4ytz(y = "y", t = "t", z = "z", data = df_na), "contains NA")
+})

@@ -175,11 +175,20 @@ lpr4ytz <- function(y, t, z, x = NULL, model = "no_interaction", data) {
     get_pred <- function(outcome, val) {
 
       df_sub <- data[z_vec == val, , drop = FALSE]
+      subgroup <- if (val == 1) "z=1" else "z=0"
 
-      fit <- lm(as.formula(paste(outcome, "~", fmla)), data = df_sub)
+      fit <- tryCatch(
+        lm(as.formula(paste(outcome, "~", fmla)), data = df_sub),
+        error = function(e) {
+          stop("interaction model failed for ", subgroup, " subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for ", subgroup, " subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(as.formula(paste(outcome, "~", fmla)), data = df_sub))
+        }
+      )
 
       pred <- predict(fit, newdata = data)
-
       return(pmin(pmax(pred, 0), 1))
     }
 
@@ -191,7 +200,6 @@ lpr4ytz <- function(y, t, z, x = NULL, model = "no_interaction", data) {
 
     num <- mean(y1 - y0)
     den <- mean(den0 - den1)
-
     lpr <- num / den
 
     res <- list(

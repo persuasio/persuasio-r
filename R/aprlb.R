@@ -62,6 +62,9 @@ aprlb <- function(y, z, x = NULL, model = "no_interaction", data) {
   y_vec <- data[[y]]
   z_vec <- data[[z]]
 
+  if (anyNA(y_vec)) stop(y, " contains NA values. Remove or impute before calling.")
+  if (anyNA(z_vec)) stop(z, " contains NA values. Remove or impute before calling.")
+
   if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
   if (!all(z_vec %in% c(0,1))) stop(paste0(z, " must be binary"))
 
@@ -158,8 +161,27 @@ aprlb <- function(y, z, x = NULL, model = "no_interaction", data) {
 
       fmla <- as.formula(paste(y, "~", x_formula))
 
-      fit1 <- lm(fmla, data = data[z_vec == 1, ])
-      fit0 <- lm(fmla, data = data[z_vec == 0, ])
+      fit1 <- tryCatch(
+        lm(fmla, data = data[z_vec == 1, ]),
+        error = function(e) {
+          stop("interaction model failed for z=1 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=1 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla, data = data[z_vec == 1, ]))
+        }
+      )
+
+      fit0 <- tryCatch(
+        lm(fmla, data = data[z_vec == 0, ]),
+        error = function(e) {
+          stop("interaction model failed for z=0 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=0 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla, data = data[z_vec == 0, ]))
+        }
+      )
 
       yhat1 <- predict(fit1, newdata = data)
       yhat0 <- predict(fit0, newdata = data)

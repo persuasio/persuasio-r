@@ -179,8 +179,27 @@ aprub <- function(y, t, z, x = NULL, model = "no_interaction", data) {
       fmla_A <- as.formula(paste("A ~", fmla))
       fmla_B <- as.formula(paste("B ~", fmla))
 
-      fA <- lm(fmla_A, data = data[z_vec == 1, ])
-      fB <- lm(fmla_B, data = data[z_vec == 0, ])
+      fA <- tryCatch(
+        lm(fmla_A, data = data[z_vec == 1, ]),
+        error = function(e) {
+          stop("interaction model failed for z=1 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=1 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla_A, data = data[z_vec == 1, ]))
+        }
+      )
+
+      fB <- tryCatch(
+        lm(fmla_B, data = data[z_vec == 0, ]),
+        error = function(e) {
+          stop("interaction model failed for z=0 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=0 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla_B, data = data[z_vec == 0, ]))
+        }
+      )
 
       yhat1 <- predict(fA, newdata = data)
       yhat0 <- predict(fB, newdata = data)
