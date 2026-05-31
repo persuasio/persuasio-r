@@ -2,7 +2,7 @@
 #'
 #' @description Main wrapper for the \pkg{persuasio} package. Provides a
 #'   unified entry point to all persuasion effect estimators. The function
-#'   parses inputs, optionally subsets the data, and dispatches to the
+#'   parses inputs and dispatches to the
 #'   appropriate estimator based on \code{est}.
 #'
 #'   Variables in \code{varlist} must be supplied in estimator-specific order.
@@ -29,7 +29,6 @@
 #' For \code{est = "yz"}, use \code{c(y, z, x, ...)}.
 #'
 #' @param data data.frame containing variables
-#' @param subset optional vector of row indices or logical filter
 #' @param ... additional arguments passed to downstream estimators
 #'
 #' @return An object of class depending on \code{est}:
@@ -44,7 +43,6 @@
 #' This function only performs:
 #' \enumerate{
 #'   \item input parsing
-#'   \item optional subsetting
 #'   \item method dispatch
 #' }
 #'
@@ -91,7 +89,6 @@
 persuasio <- function(est = c("apr", "lpr", "yz", "calc"),
                       varlist,
                       data,
-                      subset = NULL,
                       ...) {
 
   est <- match.arg(est)
@@ -106,10 +103,6 @@ persuasio <- function(est = c("apr", "lpr", "yz", "calc"),
 
   if (est == "calc" && length(varlist) < 3) {
     stop("varlist must contain y, t, and z for est = 'calc' when data is supplied")
-  }
-
-  if (!is.null(subset)) {
-    data <- data[subset, , drop = FALSE]
   }
 
   y <- varlist[1]
