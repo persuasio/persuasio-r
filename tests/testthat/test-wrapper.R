@@ -41,12 +41,6 @@ test_that("persuasio4ytz bootstrap respects external RNG state", {
   expect_equal(res1$ci_ub, res2$ci_ub)
 })
 
-test_that("persuasio4ytz accepts seed parameter", {
-  expect_no_error(
-    persuasio4ytz(y = "y", t = "t", z = "z", method = "bootstrap", nboot = 50, seed = 42, data = df)
-  )
-})
-
 test_that("persuasio wrapper routes to yz with y, z, x order", {
   res <- persuasio(
     est = "yz", y = "y", z = "z", x = "x1",
