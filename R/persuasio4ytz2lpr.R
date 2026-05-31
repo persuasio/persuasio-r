@@ -110,7 +110,7 @@ persuasio4ytz2lpr <- function(y, t, z, x = NULL,
   method <- match.arg(method, c("normal", "bootstrap"))
 
   # core estimation
-  res <- lpr4ytz(data, y, t, z, x, model)
+  res <- lpr4ytz(y = y, t = t, z = z, x = x, model = model, data = data)
 
   lpr_coef <- res$lpr
   se <- res$se

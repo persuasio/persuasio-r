@@ -109,8 +109,8 @@ persuasio4ytz <- function(y, t, z, x = NULL,
   method <- match.arg(method, c("normal", "bootstrap"))
 
   # core estimation
-  lb <- aprlb(data, y, z, x, model)
-  ub <- aprub(data, y, t, z, x, model)
+  lb <- aprlb(y = y, z = z, x = x, model = model, data = data)
+  ub <- aprub(y = y, t = t, z = z, x = x, model = model, data = data)
 
   lb_coef <- lb$lb_coef
   ub_coef <- ub$ub_coef

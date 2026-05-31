@@ -101,7 +101,7 @@ persuasio4yz <- function(y, z, x = NULL,
 
   method <- match.arg(method, c("normal", "bootstrap"))
 
-  lb <- aprlb(data, y, z, x, model)
+  lb <- aprlb(y = y, z = z, x = x, model = model, data = data)
 
   lb_coef <- lb$lb_coef
   ub_coef <- 1
