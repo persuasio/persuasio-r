@@ -83,7 +83,6 @@ persuasio(
   y = "voteddem_all",
   t = "readsome",
   z = "post",
-  data = GKB,
   level = 0.80,
   method = "normal",
   data = GKB
@@ -95,7 +94,6 @@ persuasio(
   y = "voteddem_all",
   z = "post",
   x = "MZwave2",
-  data = GKB,
   level = 0.80,
   model = "interaction",
   method = "bootstrap",

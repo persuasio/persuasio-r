@@ -29,7 +29,7 @@
 #' @source Gerber, A., Karlan, D. and Bergan, D. (2009) Data and Code for: Does
 #'   the Media Matter? A Field Experiment Measuring the Effect of Newspapers on
 #'   Voting Behavior and Political Opinions. Ann Arbor, MI: Inter-university
-#'   Consortium for Political and Social Research [distributor], 2019-10-12.
+#'   Consortium for Political and Social Research, 2019-10-12.
 #'   \doi{10.3886/E113559V1}
 #'
 #' @references Gerber, A., Karlan, D. and Bergan, D. (2009). Does the Media
