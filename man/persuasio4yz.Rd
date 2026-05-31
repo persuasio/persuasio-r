@@ -12,7 +12,6 @@ persuasio4yz(
   method = "normal",
   level = 0.95,
   nboot = 50,
-  title = NULL,
   data
 )
 }
@@ -32,11 +31,7 @@ persuasio4yz(
 
 \item{nboot}{number of bootstrap replications (default 50)}
 
-\item{title}{optional title for output display}
-
 \item{data}{data.frame containing variables}
-
-\item{subset}{optional index or logical vector for subsetting data}
 }
 \value{
 An object of class \code{persuasio4yz} containing:
@@ -53,7 +48,6 @@ An object of class \code{persuasio4yz} containing:
 \item{covariates}{covariates used}
 \item{model}{model specification}
 \item{nboot}{number of bootstrap replications (if applicable)}
-\item{title}{optional title}
 }
 }
 \description{

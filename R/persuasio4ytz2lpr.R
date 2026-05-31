@@ -26,7 +26,6 @@
 #'   \code{"interaction"}
 #' @param method inference method: \code{"normal"} or \code{"bootstrap"}
 #' @param nboot number of bootstrap replications (default 50)
-#' @param title optional title for printed output
 #' @param data data.frame containing variables
 #'
 #' @return An object of class \code{persuasio4ytz2lpr} containing:
@@ -44,7 +43,6 @@
 #'   \item{covariates}{covariates used}
 #'   \item{model}{model specification}
 #'   \item{nboot}{number of bootstrap replications (if applicable)}
-#'   \item{title}{optional title}
 #' }
 #'
 #' @details
@@ -107,7 +105,6 @@ persuasio4ytz2lpr <- function(y, t, z, x = NULL,
                               method = "normal",
                               level = 0.95,
                               nboot = 50,
-                              title = NULL,
                               data) {
 
   method <- match.arg(method, c("normal", "bootstrap"))
@@ -145,8 +142,7 @@ persuasio4ytz2lpr <- function(y, t, z, x = NULL,
       treatment = t,
       instrument = z,
       covariates = x,
-      model = model,
-      title = title
+      model = model
     )
 
     class(res) <- "persuasio4ytz2lpr"
@@ -186,8 +182,7 @@ persuasio4ytz2lpr <- function(y, t, z, x = NULL,
       instrument = z,
       covariates = x,
       model = model,
-      nboot = nboot,
-      title = title
+      nboot = nboot
     )
   }
 
