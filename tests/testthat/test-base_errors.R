@@ -6,148 +6,85 @@ df <- data.frame(
   x1 = c(1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
 )
 
-# 1. aprlb: non-binary outcome / instrument
 test_that("aprlb rejects non-binary inputs", {
-
   df_bad <- df
   df_bad$y[1] <- 2
-
-  expect_error(
-    aprlb(df_bad, "y", "z"),
-    "must be binary"
-  )
-
+  expect_error(aprlb(y = "y", z = "z", data = df_bad), "must be binary")
   df_bad2 <- df
   df_bad2$z[2] <- -1
-
-  expect_error(
-    aprlb(df_bad2, "y", "z"),
-    "must be binary"
-  )
+  expect_error(aprlb(y = "y", z = "z", data = df_bad2), "must be binary")
 })
 
-# 2. aprub: non-binary treatment
 test_that("aprub rejects non-binary treatment", {
-
   df_bad <- df
   df_bad$t[1] <- 3
-
-  expect_error(
-    aprub(df_bad, "y", "t", "z"),
-    "must be binary"
-  )
+  expect_error(aprub(y = "y", t = "t", z = "z", data = df_bad), "must be binary")
 })
 
-# 3. lpr4ytz: non-binary inputs
 test_that("lpr4ytz rejects invalid binary variables", {
-
   df_bad <- df
   df_bad$z[1] <- 9
-
-  expect_error(
-    lpr4ytz(df_bad, "y", "t", "z"),
-    "must be binary"
-  )
+  expect_error(lpr4ytz(y = "y", t = "t", z = "z", data = df_bad), "must be binary")
 })
 
-# 4. calc4persuasio: bounds validation
 test_that("calc4persuasio enforces [0,1] bounds", {
-
-  expect_error(
-    calc4persuasio(y1 = 1.2, y0 = 0.3),
-    "must be in \\[0,1\\]"
-  )
-
-  expect_error(
-    calc4persuasio(y1 = 0.5, y0 = -0.1),
-    "must be in \\[0,1\\]"
-  )
+  expect_error(calc4persuasio(y1 = 1.2, y0 = 0.3), "must be in \\[0,1\\]")
+  expect_error(calc4persuasio(y1 = 0.5, y0 = -0.1), "must be in \\[0,1\\]")
 })
-
-# 4b. error messages include a space between variable name and "must be binary"
-#     These tests fail with the current code (paste0(y, "must be binary"))
-#     and pass once the fix (paste0(y, " must be binary")) is applied.
 
 test_that("aprlb error message has space before 'must be binary'", {
-
   df_bad <- df
   df_bad$y[1] <- 2
-
-  expect_error(
-    aprlb(df_bad, "y", "z"),
-    "y must be binary"
-  )
-
+  expect_error(aprlb(y = "y", z = "z", data = df_bad), "y must be binary")
   df_bad2 <- df
   df_bad2$z[1] <- 2
-
-  expect_error(
-    aprlb(df_bad2, "y", "z"),
-    "z must be binary"
-  )
+  expect_error(aprlb(y = "y", z = "z", data = df_bad2), "z must be binary")
 })
 
 test_that("aprub error message has space before 'must be binary'", {
-
   df_bad <- df
   df_bad$t[1] <- 3
-
-  expect_error(
-    aprub(df_bad, "y", "t", "z"),
-    "t must be binary"
-  )
+  expect_error(aprub(y = "y", t = "t", z = "z", data = df_bad), "t must be binary")
 })
 
 test_that("lpr4ytz error message has space before 'must be binary'", {
-
   df_bad <- df
   df_bad$z[1] <- 9
-
-  expect_error(
-    lpr4ytz(df_bad, "y", "t", "z"),
-    "z must be binary"
-  )
+  expect_error(lpr4ytz(y = "y", t = "t", z = "z", data = df_bad), "z must be binary")
 })
 
-# 5. invalid model argument
 test_that("aprlb handles invalid model argument", {
-
   expect_error(
-    aprlb(df, "y", "t", "z", model = "not_a_model"),
+    aprlb(y = "y", z = "z", model = "not_a_model", data = df),
     "should be one of"
   )
 })
 
 test_that("aprub handles invalid model argument", {
-
   expect_error(
-    aprub(df, "y", "t", "z", model = "not_a_model"),
+    aprub(y = "y", t = "t", z = "z", model = "not_a_model", data = df),
     "should be one of"
   )
 })
 
 test_that("lpr4ytz handles invalid model argument", {
-
   expect_error(
-    lpr4ytz(df, "y", "t", "z", model = "not_a_model"),
+    lpr4ytz(y = "y", t = "t", z = "z", model = "not_a_model", data = df),
     "should be one of"
   )
 })
 
 test_that("wrapper estimators reject invalid inference methods", {
-
   expect_error(
-    persuasio4ytz(df, "y", "t", "z", method = "not_a_method"),
+    persuasio4ytz(y = "y", t = "t", z = "z", method = "not_a_method", data = df),
     "should be one of"
   )
-
   expect_error(
-    persuasio4ytz2lpr(df, "y", "t", "z", method = "not_a_method"),
+    persuasio4ytz2lpr(y = "y", t = "t", z = "z", method = "not_a_method", data = df),
     "should be one of"
   )
-
   expect_error(
-    persuasio4yz(df, "y", "z", method = "not_a_method"),
+    persuasio4yz(y = "y", z = "z", method = "not_a_method", data = df),
     "should be one of"
   )
 })

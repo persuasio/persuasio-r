@@ -7,12 +7,10 @@ test_that("functions work with covariates x", {
     x1 = c(1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
   )
 
-  res1 <- aprlb(df, "y", "z", x = "x1")
+  res1 <- aprlb(y = "y", z = "z", x = "x1", data = df)
   expect_true(is.numeric(res1$lb_coef))
-
-  res2 <- aprub(df, "y", "t", "z", x = "x1")
+  res2 <- aprub(y = "y", t = "t", z = "z", x = "x1", data = df)
   expect_true(is.numeric(res2$ub_coef))
-
-  res3 <- lpr4ytz(df, "y", "t", "z", x = "x1")
+  res3 <- lpr4ytz(y = "y", t = "t", z = "z", x = "x1", data = df)
   expect_true(is.numeric(res3$lpr))
 })
