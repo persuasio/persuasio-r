@@ -4,20 +4,21 @@
 \alias{aprub}
 \title{Estimate the upper bound of the average persuasion rate}
 \usage{
-aprub(data, y, t, z, x = NULL, model = "no_interaction")
+aprub(y, t, z, x = NULL, model = "no_interaction", data)
 }
 \arguments{
+\item{y}{character, outcome variable name (binary 0/1)}
+
+\item{t}{character, treatment variable name (binary 0/1)}
+
+\item{z}{character, instrument variable name (binary 0/1)}
+
+\item{x}{optional character, vector of covariates. Defaults to \code{NULL}.}
+
+\item{model}{character, model specification: "no_interaction" or "interaction". Defaults
+to \code{no_interaction}.}
+
 \item{data}{data.frame containing variables}
-
-\item{y}{outcome, outcome variable (binary 0/1)}
-
-\item{t}{treatment. treatment variable (binary 0/1)}
-
-\item{z}{instrument, instrument variable (binary 0/1)}
-
-\item{x}{optional covariates, if they exist}
-
-\item{model}{model specification: "no_interaction" or "interaction"}
 }
 \value{
 A list with:
@@ -45,15 +46,15 @@ specifications: \code{no_interaction}and \code{interaction}.
 }
 \examples{
 # Example 1: No covariates
-aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post")
+aprub(y = "voteddem_all", t = "readsome", z = "post", data = GKB)
 
 # Example 2: With covariate
-aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post", x = "MZwave2")
+aprub(y = "voteddem_all", t = "readsome", z = "post", x = "MZwave2", data = GKB)
 
 # Example 3: Estimate by the covariate
 gkb_groups <- split(GKB, GKB$MZwave2)
 lapply(gkb_groups, function(sub_data) {
-  aprub(data = sub_data, y = "voteddem_all", t = "readsome", z = "post")
+  aprub(y = "voteddem_all", t = "readsome", z = "post", data = sub_data)
 })
 
 

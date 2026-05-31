@@ -4,18 +4,19 @@
 \alias{aprlb}
 \title{Estimate the lower bound of the average persuasion rate}
 \usage{
-aprlb(data, y, z, x = NULL, model = "no_interaction")
+aprlb(y, z, x = NULL, model = "no_interaction", data)
 }
 \arguments{
+\item{y}{character, outcome variable name (binary 0/1)}
+
+\item{z}{character, instrument variable name (binary 0/1)}
+
+\item{x}{optional character, vector of covariates. Defaults to \code{NULL}.}
+
+\item{model}{model specification: "no_interaction" or "interaction". Defaults
+to \code{no_interaction}.}
+
 \item{data}{data.frame containing variables}
-
-\item{y}{outcome, outcome variable (binary 0/1)}
-
-\item{z}{instrument, instrument variable (binary 0/1)}
-
-\item{x}{optional covariates, if they exist}
-
-\item{model}{model specification: "no_interaction" or "interaction"}
 }
 \value{
 A list with:
@@ -42,15 +43,15 @@ available. With covariates, there are two model specifications:
 }
 \examples{
 # Example 1: No covariates
-aprlb(data = GKB, y = "voteddem_all", z = "post")
+aprlb(y = "voteddem_all", z = "post", data = GKB)
 
 # Example 2: With covariate
-aprlb(data = GKB, y = "voteddem_all", z = "post", x = "MZwave2")
+aprlb(y = "voteddem_all", z = "post", x = "MZwave2", data = GKB)
 
 # Example 3: Estimate by the covariate
 gkb_groups <- split(GKB, GKB$MZwave2)
 lapply(gkb_groups, function(sub_data) {
-  aprlb(data = sub_data, y = "voteddem_all", z = "post")
+  aprlb(y = "voteddem_all", z = "post", data = sub_data)
 })
 
 

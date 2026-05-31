@@ -5,7 +5,6 @@
 \title{Causal Inference on Persuasion Effects Using Outcome and Instrument Only}
 \usage{
 persuasio4yz(
-  data,
   y,
   z,
   x = NULL,
@@ -14,18 +13,15 @@ persuasio4yz(
   level = 0.95,
   nboot = 50,
   title = NULL,
-  subset = NULL,
-  seed = NULL
+  data
 )
 }
 \arguments{
-\item{data}{data.frame containing variables}
-
 \item{y}{character, outcome variable name (binary 0/1)}
 
 \item{z}{character, instrument variable name (binary 0/1)}
 
-\item{x}{optional character vector of covariates}
+\item{x}{optional character, vector of covariates. Defaults to \code{NULL}.}
 
 \item{model}{model specification: \code{"no_interaction"} or
 \code{"interaction"}}
@@ -38,9 +34,9 @@ persuasio4yz(
 
 \item{title}{optional title for output display}
 
-\item{subset}{optional index or logical vector for subsetting data}
+\item{data}{data.frame containing variables}
 
-\item{seed}{optional random seed for bootstrap reproducibility}
+\item{subset}{optional index or logical vector for subsetting data}
 }
 \value{
 An object of class \code{persuasio4yz} containing:
@@ -89,33 +85,33 @@ estimates. Set \code{seed} for reproducible results.
 \examples{
 # Example 1: No covariates, normal inference
 persuasio4yz(
-  data   = GKB,
   y      = "voteddem_all",
   z      = "post",
   method = "normal",
-  level  = 0.80
+  level  = 0.80,
+  data   = GKB
 )
 
 # Example 2: No covariates, bootstrap inference
 persuasio4yz(
-  data   = GKB,
   y      = "voteddem_all",
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 1000,
+  data   = GKB
 )
 
 # Example 3: With covariate, interaction model, bootstrap inference
 persuasio4yz(
-  data   = GKB,
   y      = "voteddem_all",
   z      = "post",
   x      = "MZwave2",
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 1000,
+  data   = GKB
 )
 
 }

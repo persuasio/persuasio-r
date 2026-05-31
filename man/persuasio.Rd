@@ -27,12 +27,11 @@ persuasio(
 
 \item{z}{character, instrument variable name (binary 0/1)}
 
-\item{t}{character, treatment variable name (binary 0/1) Required for
+\item{t}{character, treatment variable name (binary 0/1). Required for
 \code{est = "apr"}, \code{"lpr"}, and \code{"calc"}. Defaults to
 \code{NULL}.}
 
-\item{x}{An optional character vector specifying covariate variable names.
-Defaults to \code{NULL}.}
+\item{x}{optional character, vector of covariates Defaults to \code{NULL}.}
 
 \item{data}{data.frame containing variables}
 
@@ -73,9 +72,9 @@ persuasio(
   y = "voteddem_all",
   t = "readsome",
   z = "post",
-  data = GKB,
   level = 0.80,
-  method = "normal"
+  method = "normal",
+  data = GKB
 )
 
 # Example 2: Local persuasion rate (LPR) with normal inference
@@ -86,7 +85,8 @@ persuasio(
   z = "post",
   data = GKB,
   level = 0.80,
-  method = "normal"
+  method = "normal",
+  data = GKB
 )
 
 # Example 3: Outcome-instrument bounds with covariate and bootstrap inference
@@ -99,7 +99,8 @@ persuasio(
   level = 0.80,
   model = "interaction",
   method = "bootstrap",
-  nboot = 1000
+  nboot = 1000,
+  data = GKB
 )
 
 

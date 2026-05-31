@@ -18,19 +18,17 @@
 #'   \item inference using either Stoye-style normal approximation or bootstrap
 #' }
 #'
-#' @param data data.frame containing variables
 #' @param y character, outcome variable name (binary 0/1)
 #' @param t character, treatment variable name (binary 0/1)
 #' @param z character, instrument variable name (binary 0/1)
-#' @param x optional character vector of covariates
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
 #' @param level confidence level (default 0.95)
 #' @param model model specification: \code{"no_interaction"} or
 #'   \code{"interaction"}
 #' @param method inference method: \code{"normal"} or \code{"bootstrap"}
 #' @param nboot number of bootstrap replications (default 50)
 #' @param title optional title for printed output
-#' @param subset optional index or logical vector for subsetting data
-#' @param seed optional integer random seed for bootstrap reproducibility
+#' @param data data.frame containing variables
 #'
 #' @return An object of class \code{persuasio4ytz} containing:
 #' \describe{
@@ -70,28 +68,27 @@
 #' @examples
 #' # Example 1: No covariates, normal inference
 #' persuasio4ytz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
 #'   method = "normal",
-#'   level  = 0.80
+#'   level  = 0.80,
+#'   data   = GKB
 #' )
 #'
 #' # Example 2: No covariates, bootstrap inference
 #' persuasio4ytz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' # Example 3: With covariate, interaction model, bootstrap inference
 #' persuasio4ytz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
@@ -99,27 +96,20 @@
 #'   model  = "interaction",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' @export
-persuasio4ytz <- function(data, y, t, z, x = NULL,
+persuasio4ytz <- function(y, t, z, x = NULL,
                           model = "no_interaction",
                           method = "normal",
                           level = 0.95,
                           nboot = 50,
                           title = NULL,
-                          subset = NULL,
-                          seed = NULL) {
+                          data) {
 
   method <- match.arg(method, c("normal", "bootstrap"))
-
-  if (!is.null(seed)) set.seed(seed)
-
-  # subset handling
-  if (!is.null(subset)) {
-    data <- data[subset, , drop = FALSE]
-  }
 
   # core estimation
   lb <- aprlb(data, y, z, x, model)

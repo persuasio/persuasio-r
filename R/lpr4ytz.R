@@ -8,12 +8,13 @@
 #'   \code{z = 0} subgroups; standard errors are not available in this case
 #'   unless \code{model = "no_interaction"} is specified.
 #'
-#' @param data data.frame
-#' @param y outcome variable (binary)
-#' @param t treatment variable (binary)
-#' @param z instrument variable (binary)
-#' @param x covariates (optional character vector)
-#' @param model "no_interaction" or "interaction"
+#' @param y character, outcome variable name (binary 0/1)
+#' @param t character, treatment variable name (binary 0/1)
+#' @param z character, instrument variable name (binary 0/1)
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
+#' @param model character, model specification: "no_interaction" or "interaction". Defaults
+#'   to \code{no_interaction}.
+#' @param data data.frame containing variables
 #'
 #' @return A list with:
 #' \itemize{
@@ -40,10 +41,10 @@
 #' @examples
 #' # Example 1: No covariates
 #' lpr4ytz(
-#'   data = GKB,
 #'   y    = "voteddem_all",
 #'   t    = "readsome",
-#'   z    = "post"
+#'   z    = "post",
+#'   data = GKB
 #' )
 #'
 #' # Example 2: With covariate (interaction model, default)
@@ -52,22 +53,23 @@
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
 #'   z     = "post",
-#'   x     = "MZwave2"
+#'   x     = "MZwave2",
+#'   data = GKB
 #' )
 #'
 #' # Example 3: With covariate (no-interaction model)
 #' lpr4ytz(
-#'   data  = GKB,
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
 #'   z     = "post",
 #'   x     = "MZwave2",
-#'   model = "no_interaction"
+#'   model = "no_interaction",
+#'   data  = GKB
 #' )
 #'
 #'
 #' @export
-lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
+lpr4ytz <- function(y, t, z, x = NULL, model = "no_interaction", data) {
 
   model <- match.arg(model, c("no_interaction", "interaction"))
 

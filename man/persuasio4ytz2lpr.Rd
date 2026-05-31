@@ -5,7 +5,6 @@
 \title{Causal Inference on the Local Persuasion Rate}
 \usage{
 persuasio4ytz2lpr(
-  data,
   y,
   t,
   z,
@@ -15,19 +14,17 @@ persuasio4ytz2lpr(
   level = 0.95,
   nboot = 50,
   title = NULL,
-  seed = NULL
+  data
 )
 }
 \arguments{
-\item{data}{data.frame containing variables}
-
 \item{y}{character, outcome variable name (binary 0/1)}
 
 \item{t}{character, treatment variable name (binary 0/1)}
 
 \item{z}{character, instrument variable name (binary 0/1)}
 
-\item{x}{optional character vector of covariates}
+\item{x}{optional character, vector of covariates. Defaults to \code{NULL}.}
 
 \item{model}{model specification: \code{"no_interaction"} or
 \code{"interaction"}}
@@ -40,7 +37,7 @@ persuasio4ytz2lpr(
 
 \item{title}{optional title for printed output}
 
-\item{seed}{optional random seed for bootstrap reproducibility}
+\item{data}{data.frame containing variables}
 }
 \value{
 An object of class \code{persuasio4ytz2lpr} containing:
@@ -94,28 +91,27 @@ Set \code{seed} for reproducible results.
 \examples{
 # Example 1: No covariates, normal inference
 persuasio4ytz2lpr(
-  data   = GKB,
   y      = "voteddem_all",
   t      = "readsome",
   z      = "post",
   method = "normal",
-  level  = 0.80
+  level  = 0.80,
+  data   = GKB
 )
 
 # Example 2: No covariates, bootstrap inference
 persuasio4ytz2lpr(
-  data   = GKB,
   y      = "voteddem_all",
   t      = "readsome",
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 1000,
+  data   = GKB
 )
 
 # Example 3: With covariate, interaction model, bootstrap inference
 persuasio4ytz2lpr(
-  data   = GKB,
   y      = "voteddem_all",
   t      = "readsome",
   z      = "post",
@@ -123,7 +119,8 @@ persuasio4ytz2lpr(
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000
+  nboot  = 1000,
+  data   = GKB
 )
 
 }

@@ -21,11 +21,10 @@
 #'
 #' @param y character, outcome variable name (binary 0/1)
 #' @param z character, instrument variable name (binary 0/1)
-#' @param t character, treatment variable name (binary 0/1) Required for
+#' @param t character, treatment variable name (binary 0/1). Required for
 #'   \code{est = "apr"}, \code{"lpr"}, and \code{"calc"}. Defaults to
 #'   \code{NULL}.
-#' @param x An optional character vector specifying covariate variable names.
-#'   Defaults to \code{NULL}.
+#' @param x optional character, vector of covariates Defaults to \code{NULL}.
 #'
 #' @param data data.frame containing variables
 #' @param ... additional arguments passed to downstream estimators
@@ -60,9 +59,9 @@
 #'   y = "voteddem_all",
 #'   t = "readsome",
 #'   z = "post",
-#'   data = GKB,
 #'   level = 0.80,
-#'   method = "normal"
+#'   method = "normal",
+#'   data = GKB
 #' )
 #'
 #' # Example 2: Local persuasion rate (LPR) with normal inference
@@ -73,7 +72,8 @@
 #'   z = "post",
 #'   data = GKB,
 #'   level = 0.80,
-#'   method = "normal"
+#'   method = "normal",
+#'   data = GKB
 #' )
 #'
 #' # Example 3: Outcome-instrument bounds with covariate and bootstrap inference
@@ -86,7 +86,8 @@
 #'   level = 0.80,
 #'   model = "interaction",
 #'   method = "bootstrap",
-#'   nboot = 1000
+#'   nboot = 1000,
+#'   data = GKB
 #' )
 #'
 #'
