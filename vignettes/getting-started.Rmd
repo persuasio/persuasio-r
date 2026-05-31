@@ -107,24 +107,6 @@ in the `R` folder or run `?GKB` in the console.
 a single interface that handles input parsing and dispatches to the correct
 estimator based on the `est` argument.
 
-### Argument overview
-
-| Argument  | Purpose                                                        | Default              |
-|-----------|----------------------------------------------------------------|----------------------|
-| `est`     | Which estimand to target (`"apr"`, `"lpr"`, `"yz"`, `"calc"`)  | Required             |
-| `varlist` | Variable names in estimator-specific order                     | Required             |
-| `data`    | Data frame                                                     | Required             |
-| `level`   | Confidence level                                               | `0.95`               |
-| `model`   | `"no_interaction"` or `"interaction"`                          | `"no_interaction"`   |
-| `method`  | `"normal"` or `"bootstrap"`                                    | `"normal"`           |
-| `nboot`   | Bootstrap replications, only when `method = "bootstrap"`       | `50`                 |
-
-### `varlist` ordering
-
-For `est = "apr"`, `"lpr"`, and `"calc"`, variables must be supplied in the
-order `c(y, t, z, x, ...)`. For `est = "yz"`, where the treatment variable is
-not observed, use `c(y, z, x, ...)`.
-
 ### Examples using the GKB dataset
 
 **Example 1: Average persuasion rate (APR)**
