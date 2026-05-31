@@ -168,10 +168,14 @@ persuasio4ytz <- function(y, t, z, x = NULL,
   if (method == "bootstrap") {
 
     lb_boot <- numeric(nboot)
+
     for (b in seq_len(nboot)) {
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
-      lb_b <- suppressWarnings(try(aprlb(d_b, y, z, x, model), silent = TRUE))
+
+      lb_b <- suppressWarnings(try(
+        aprlb(y = y, z = z, x = x, model = model, data = d_b), silent = TRUE
+      ))
       lb_boot[b] <- if (inherits(lb_b, "try-error")) NA else lb_b$lb_coef
     }
 
@@ -179,13 +183,15 @@ persuasio4ytz <- function(y, t, z, x = NULL,
     for (b in seq_len(nboot)) {
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
-      ub_b <- suppressWarnings(try(aprub(d_b, y, t, z, x, model), silent = TRUE))
+
+      ub_b <- suppressWarnings(try(
+        aprub(y = y, t = t, z = z, x = x, model = model, data = d_b), silent = TRUE
+      ))
       ub_boot[b] <- if (inherits(ub_b, "try-error")) NA else ub_b$ub_coef
     }
 
     lb_boot <- lb_boot[!is.na(lb_boot)]
     ub_boot <- ub_boot[!is.na(ub_boot)]
-
     ci_lb <- quantile(lb_boot, probs = alpha)
     ci_ub <- quantile(ub_boot, probs = 1 - alpha)
 

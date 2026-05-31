@@ -150,7 +150,10 @@ persuasio4yz <- function(y, z, x = NULL,
     for (b in seq_len(nboot)) {
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
-      lb_b <- suppressWarnings(try(aprlb(d_b, y, z, x, model), silent = TRUE))
+
+      lb_b <- suppressWarnings(try(
+        aprlb(y = y, z = z, x = x, model = model, data = d_b), silent = TRUE
+      ))
       lb_boot[b] <- if (inherits(lb_b, "try-error")) NA else lb_b$lb_coef
     }
 
