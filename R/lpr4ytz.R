@@ -49,7 +49,6 @@
 #'
 #' # Example 2: With covariate (interaction model, default)
 #' lpr4ytz(
-#'   data  = GKB,
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
 #'   z     = "post",
