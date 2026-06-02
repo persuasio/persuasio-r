@@ -8,12 +8,13 @@
 #'   \code{z = 0} subgroups; standard errors are not available in this case
 #'   unless \code{model = "no_interaction"} is specified.
 #'
-#' @param data data.frame
-#' @param y outcome variable (binary)
-#' @param t treatment variable (binary)
-#' @param z instrument variable (binary)
-#' @param x covariates (optional character vector)
-#' @param model "no_interaction" or "interaction"
+#' @param y character, outcome variable name (binary 0/1)
+#' @param t character, treatment variable name (binary 0/1)
+#' @param z character, instrument variable name (binary 0/1)
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
+#' @param model character, model specification: "no_interaction" or "interaction". Defaults
+#'   to \code{no_interaction}.
+#' @param data data.frame containing variables
 #'
 #' @return A list with:
 #' \itemize{
@@ -40,34 +41,34 @@
 #' @examples
 #' # Example 1: No covariates
 #' lpr4ytz(
-#'   data = GKB,
 #'   y    = "voteddem_all",
 #'   t    = "readsome",
-#'   z    = "post"
+#'   z    = "post",
+#'   data = GKB
 #' )
 #'
 #' # Example 2: With covariate (interaction model, default)
 #' lpr4ytz(
-#'   data  = GKB,
-#'   y     = "voteddem_all",
-#'   t     = "readsome",
-#'   z     = "post",
-#'   x     = "MZwave2"
-#' )
-#'
-#' # Example 3: With covariate (no-interaction model)
-#' lpr4ytz(
-#'   data  = GKB,
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
 #'   z     = "post",
 #'   x     = "MZwave2",
-#'   model = "no_interaction"
+#'   data = GKB
+#' )
+#'
+#' # Example 3: With covariate (no-interaction model)
+#' lpr4ytz(
+#'   y     = "voteddem_all",
+#'   t     = "readsome",
+#'   z     = "post",
+#'   x     = "MZwave2",
+#'   model = "no_interaction",
+#'   data  = GKB
 #' )
 #'
 #'
 #' @export
-lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
+lpr4ytz <- function(y, t, z, x = NULL, model = "no_interaction", data) {
 
   model <- match.arg(model, c("no_interaction", "interaction"))
 
@@ -79,6 +80,10 @@ lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
   y_vec <- data[[y]]
   t_vec <- data[[t]]
   z_vec <- data[[z]]
+
+  if (anyNA(y_vec)) stop(paste0("remove or impute NA in ", y, " before proceeding. Must be binary."))
+  if (anyNA(t_vec)) stop(paste0("remove or impute NA in ", t, " before proceeding. Must be binary."))
+  if (anyNA(z_vec)) stop(paste0("remove or impute NA in ", z, " before proceeding. Must be binary."))
 
   if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
   if (!all(t_vec %in% c(0,1))) stop(paste0(t, " must be binary"))
@@ -174,11 +179,20 @@ lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
     get_pred <- function(outcome, val) {
 
       df_sub <- data[z_vec == val, , drop = FALSE]
+      subgroup <- if (val == 1) "z=1" else "z=0"
 
-      fit <- lm(as.formula(paste(outcome, "~", fmla)), data = df_sub)
+      fit <- tryCatch(
+        lm(as.formula(paste(outcome, "~", fmla)), data = df_sub),
+        error = function(e) {
+          stop("interaction model failed for ", subgroup, " subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for ", subgroup, " subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(as.formula(paste(outcome, "~", fmla)), data = df_sub))
+        }
+      )
 
       pred <- predict(fit, newdata = data)
-
       return(pmin(pmax(pred, 0), 1))
     }
 
@@ -190,7 +204,6 @@ lpr4ytz <- function(data, y, t, z, x = NULL, model = "no_interaction") {
 
     num <- mean(y1 - y0)
     den <- mean(den0 - den1)
-
     lpr <- num / den
 
     res <- list(

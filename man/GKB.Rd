@@ -3,24 +3,50 @@
 \docType{data}
 \name{GKB}
 \alias{GKB}
-\title{GKB Dataset}
+\title{GKB}
 \format{
-A data frame with 701 rows and 4 binary (0/1) variables:
+A data frame with 701 rows and 4 variables:
 \describe{
-\item{post}{Post-treatment indicator}
-\item{voteddem_all}{Voted Democratic (outcome y)}
-\item{readsome}{Read newspaper treatment (treatment t)}
-\item{MZwave2}{Instrument z}
+\item{voteddem_all}{indicator (outcome): equal to 1 if the individual voted for the Democratic candidate}
+\item{readsome}{indicator (treatment): equal to 1 if the individual read a newspaper at least several times per week}
+\item{post}{indicator (instrument): equal to 1 if the individual received a free subscription to the Washington Post}
+\item{MZwave2}{indicator (covariate): equal to 1 if the individual was assigned to the second wave of the experiment}
 }
 }
 \source{
-Gerber, Karlan, and Bergan (2009)
+Gerber, A., Karlan, D. and Bergan, D. (2009) Data and Code for: Does
+the Media Matter? A Field Experiment Measuring the Effect of Newspapers on
+Voting Behavior and Political Opinions. Ann Arbor, MI: Inter-university
+Consortium for Political and Social Research, 2019-10-12.
+\doi{10.3886/E113559V1}
 }
 \usage{
 GKB
 }
 \description{
-Data from Gerber, Karlan, and Bergan (2009) on media persuasion effects.
-Used as the example dataset for the persuasio package.
+Dataset from Gerber, Karlan, and Bergan (2009).
+The study examines the effect of media exposure on political behavior via a
+randomized experiment offering households in Prince William County, VA free
+ten-week subscriptions to the Washington Post (liberal) or the Washington
+Times (conservative). The authors administered a baseline survey one month
+before the November 2005 Virginia gubernatorial election, and a follow-up
+survey a week after the election, covering individuals' voting behavior,
+candidate preference, political attitudes, and knowledge of recent news
+events.
+}
+\details{
+To demonstrate functions in the this package, we use a
+simplified subset of Washington Post subscribers who responded to the
+follow-up survey (n = 701). The outcome is voting for the Democratic
+candidate in the 2005 Virginia gubernatorial election. The experiment
+ran in two waves a week apart due to capacity constraints, with wave
+assignment recorded in \code{MZwave2}. This data subset is also used in
+Jun and Lee (2023).
+}
+\references{
+Gerber, A., Karlan, D. and Bergan, D. (2009). Does the Media
+Matter? A Field Experiment Measuring the Effect of Newspapers on Voting
+Behavior and Political Opinions. American Economic Journal: Applied
+Economics, 1(2), 35-52. \doi{10.1257/app.1.2.35}
 }
 \keyword{datasets}

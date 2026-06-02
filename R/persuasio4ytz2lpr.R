@@ -17,18 +17,16 @@
 #'   present, analytic standard errors are unavailable and
 #'   \code{method = "bootstrap"} is required.
 #'
-#' @param data data.frame containing variables
 #' @param y character, outcome variable name (binary 0/1)
 #' @param t character, treatment variable name (binary 0/1)
 #' @param z character, instrument variable name (binary 0/1)
-#' @param x optional character vector of covariates
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
 #' @param level confidence level (default 0.95)
 #' @param model model specification: \code{"no_interaction"} or
 #'   \code{"interaction"}
 #' @param method inference method: \code{"normal"} or \code{"bootstrap"}
 #' @param nboot number of bootstrap replications (default 50)
-#' @param title optional title for printed output
-#' @param seed optional random seed for bootstrap reproducibility
+#' @param data data.frame containing variables
 #'
 #' @return An object of class \code{persuasio4ytz2lpr} containing:
 #' \describe{
@@ -45,7 +43,6 @@
 #'   \item{covariates}{covariates used}
 #'   \item{model}{model specification}
 #'   \item{nboot}{number of bootstrap replications (if applicable)}
-#'   \item{title}{optional title}
 #' }
 #'
 #' @details
@@ -70,28 +67,27 @@
 #' @examples
 #' # Example 1: No covariates, normal inference
 #' persuasio4ytz2lpr(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
 #'   method = "normal",
-#'   level  = 0.80
+#'   level  = 0.80,
+#'   data   = GKB
 #' )
 #'
 #' # Example 2: No covariates, bootstrap inference
 #' persuasio4ytz2lpr(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' # Example 3: With covariate, interaction model, bootstrap inference
 #' persuasio4ytz2lpr(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   t      = "readsome",
 #'   z      = "post",
@@ -99,24 +95,22 @@
 #'   model  = "interaction",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' @export
-persuasio4ytz2lpr <- function(data, y, t, z, x = NULL,
+persuasio4ytz2lpr <- function(y, t, z, x = NULL,
                               model = "no_interaction",
                               method = "normal",
                               level = 0.95,
                               nboot = 50,
-                              title = NULL,
-                              seed = NULL) {
+                              data) {
 
   method <- match.arg(method, c("normal", "bootstrap"))
 
-  if (!is.null(seed)) set.seed(seed)
-
   # core estimation
-  res <- lpr4ytz(data, y, t, z, x, model)
+  res <- lpr4ytz(y = y, t = t, z = z, x = x, model = model, data = data)
 
   lpr_coef <- res$lpr
   se <- res$se
@@ -148,8 +142,7 @@ persuasio4ytz2lpr <- function(data, y, t, z, x = NULL,
       treatment = t,
       instrument = z,
       covariates = x,
-      model = model,
-      title = title
+      model = model
     )
 
     class(res) <- "persuasio4ytz2lpr"
@@ -162,17 +155,16 @@ persuasio4ytz2lpr <- function(data, y, t, z, x = NULL,
     boot <- numeric(nboot)
 
     for (b in seq_len(nboot)) {
-
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
 
-      r <- suppressWarnings(try(lpr4ytz(d_b, y, t, z, x, model), silent = TRUE))
-
-      boot[b] <- if (inherits(r, "try-error")) NA else r$lpr
+      boot_fit <- suppressWarnings(try(
+        lpr4ytz(y = y, t = t, z = z, x = x, model = model, data = d_b), silent = TRUE
+      ))
+      boot[b] <- if (inherits(boot_fit, "try-error")) NA else boot_fit$lpr
     }
 
     boot <- boot[!is.na(boot)]
-
     ci_lb <- max(0, quantile(boot, probs = alpha / 2))
     ci_ub <- min(1, quantile(boot, probs = 1 - alpha / 2))
 
@@ -189,8 +181,7 @@ persuasio4ytz2lpr <- function(data, y, t, z, x = NULL,
       instrument = z,
       covariates = x,
       model = model,
-      nboot = nboot,
-      title = title
+      nboot = nboot
     )
   }
 

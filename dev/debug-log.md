@@ -28,14 +28,18 @@ The following were identified but not yet addressed. Pick up in the next pass.
 1. **Numerical comparison of bootstrap CIs** — structural alignment with Stata
    has been verified (separate loops, quantile levels), but no side-by-side
    numerical check on the same dataset has been run yet.
+   Sarah's comment: R and Stata's random number generations are not comparable (?)
 2. **Covariate interaction model edge cases** — `model = "interaction"` with
    small subgroups or collinear covariates has not been stress-tested.
+   Sarah's comment: added tryCatch for informative warning messages and updated tests.
 3. **Missing value handling** — binary checks (`%in% c(0,1)`) fail silently
    when variables contain `NA` (since `NA %in% c(0,1)` is `FALSE`). Functions
    will stop with a misleading error rather than a clear NA message.
+   Sarah's comment: added NA checks before binary checks and updated tests.
 4. **`calc` via `persuasio()` summary statistics** — currently `persuasio(est
    = "calc")` derives group means from a data frame. It cannot yet accept
    pre-computed scalars (y1, y0, e1, e0) directly through the wrapper.
+   Sarah's comment: I think calc4persuasio is specifically designed for scalar summary statistics.
 
 ---
 

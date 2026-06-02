@@ -8,12 +8,12 @@
 #'   `no_interaction`and `interaction`.
 #'
 #'
+#' @param y character, outcome variable name (binary 0/1)
+#' @param z character, instrument variable name (binary 0/1)
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
+#' @param model model specification: "no_interaction" or "interaction". Defaults
+#'   to \code{no_interaction}.
 #' @param data data.frame containing variables
-#' @param y outcome, outcome variable (binary 0/1)
-#' @param z instrument, instrument variable (binary 0/1)
-#' @param x optional covariates, if they exist
-#' @param model model specification: "no_interaction" or "interaction"
-#'
 #'
 #' @return A list with:
 #' \itemize{
@@ -37,20 +37,20 @@
 #'
 #' @examples
 #' # Example 1: No covariates
-#' aprlb(data = GKB, y = "voteddem_all", z = "post")
+#' aprlb(y = "voteddem_all", z = "post", data = GKB)
 #'
 #' # Example 2: With covariate
-#' aprlb(data = GKB, y = "voteddem_all", z = "post", x = "MZwave2")
+#' aprlb(y = "voteddem_all", z = "post", x = "MZwave2", data = GKB)
 #'
 #' # Example 3: Estimate by the covariate
 #' gkb_groups <- split(GKB, GKB$MZwave2)
 #' lapply(gkb_groups, function(sub_data) {
-#'   aprlb(data = sub_data, y = "voteddem_all", z = "post")
+#'   aprlb(y = "voteddem_all", z = "post", data = sub_data)
 #' })
 #'
 #'
 #' @export
-aprlb <- function(data, y, z, x = NULL, model = "no_interaction") {
+aprlb <- function(y, z, x = NULL, model = "no_interaction", data) {
 
   model <- match.arg(model, c("no_interaction", "interaction"))
 
@@ -61,6 +61,9 @@ aprlb <- function(data, y, z, x = NULL, model = "no_interaction") {
 
   y_vec <- data[[y]]
   z_vec <- data[[z]]
+
+  if (anyNA(y_vec)) stop(paste0("remove or impute NA in ", y, " before proceeding. Must be binary."))
+  if (anyNA(z_vec)) stop(paste0("remove or impute NA in ", z, " before proceeding. Must be binary."))
 
   if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
   if (!all(z_vec %in% c(0,1))) stop(paste0(z, " must be binary"))
@@ -158,8 +161,27 @@ aprlb <- function(data, y, z, x = NULL, model = "no_interaction") {
 
       fmla <- as.formula(paste(y, "~", x_formula))
 
-      fit1 <- lm(fmla, data = data[z_vec == 1, ])
-      fit0 <- lm(fmla, data = data[z_vec == 0, ])
+      fit1 <- tryCatch(
+        lm(fmla, data = data[z_vec == 1, ]),
+        error = function(e) {
+          stop("interaction model failed for z=1 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=1 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla, data = data[z_vec == 1, ]))
+        }
+      )
+
+      fit0 <- tryCatch(
+        lm(fmla, data = data[z_vec == 0, ]),
+        error = function(e) {
+          stop("interaction model failed for z=0 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=0 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla, data = data[z_vec == 0, ]))
+        }
+      )
 
       yhat1 <- predict(fit1, newdata = data)
       yhat0 <- predict(fit0, newdata = data)

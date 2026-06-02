@@ -7,13 +7,13 @@
 #'   standard errors are not available. With covariates, there are two model
 #'   specifications: `no_interaction`and `interaction`.
 #'
+#' @param y character, outcome variable name (binary 0/1)
+#' @param t character, treatment variable name (binary 0/1)
+#' @param z character, instrument variable name (binary 0/1)
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
+#' @param model character, model specification: "no_interaction" or "interaction". Defaults
+#'   to \code{no_interaction}.
 #' @param data data.frame containing variables
-#' @param y outcome, outcome variable (binary 0/1)
-#' @param t treatment. treatment variable (binary 0/1)
-#' @param z instrument, instrument variable (binary 0/1)
-#' @param x optional covariates, if they exist
-#' @param model model specification: "no_interaction" or "interaction"
-#'
 #'
 #' @return A list with:
 #' \itemize{
@@ -38,20 +38,20 @@
 #'
 #' @examples
 #' # Example 1: No covariates
-#' aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post")
+#' aprub(y = "voteddem_all", t = "readsome", z = "post", data = GKB)
 #'
 #' # Example 2: With covariate
-#' aprub(data = GKB, y = "voteddem_all", t = "readsome", z = "post", x = "MZwave2")
+#' aprub(y = "voteddem_all", t = "readsome", z = "post", x = "MZwave2", data = GKB)
 #'
 #' # Example 3: Estimate by the covariate
 #' gkb_groups <- split(GKB, GKB$MZwave2)
 #' lapply(gkb_groups, function(sub_data) {
-#'   aprub(data = sub_data, y = "voteddem_all", t = "readsome", z = "post")
+#'   aprub(y = "voteddem_all", t = "readsome", z = "post", data = sub_data)
 #' })
 #'
 #'
 #' @export
-aprub <- function(data, y, t, z, x = NULL, model = "no_interaction") {
+aprub <- function(y, t, z, x = NULL, model = "no_interaction", data) {
 
   model <- match.arg(model, c("no_interaction", "interaction"))
 
@@ -63,6 +63,10 @@ aprub <- function(data, y, t, z, x = NULL, model = "no_interaction") {
   y_vec <- data[[y]]
   z_vec <- data[[z]]
   t_vec <- data[[t]]
+
+  if (anyNA(y_vec)) stop(paste0("remove or impute NA in ", y, " before proceeding. Must be binary."))
+  if (anyNA(t_vec)) stop(paste0("remove or impute NA in ", t, " before proceeding. Must be binary."))
+  if (anyNA(z_vec)) stop(paste0("remove or impute NA in ", z, " before proceeding. Must be binary."))
 
   if (!all(y_vec %in% c(0,1))) stop(paste0(y, " must be binary"))
   if (!all(t_vec %in% c(0,1))) stop(paste0(t, " must be binary"))
@@ -179,8 +183,27 @@ aprub <- function(data, y, t, z, x = NULL, model = "no_interaction") {
       fmla_A <- as.formula(paste("A ~", fmla))
       fmla_B <- as.formula(paste("B ~", fmla))
 
-      fA <- lm(fmla_A, data = data[z_vec == 1, ])
-      fB <- lm(fmla_B, data = data[z_vec == 0, ])
+      fA <- tryCatch(
+        lm(fmla_A, data = data[z_vec == 1, ]),
+        error = function(e) {
+          stop("interaction model failed for z=1 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=1 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla_A, data = data[z_vec == 1, ]))
+        }
+      )
+
+      fB <- tryCatch(
+        lm(fmla_B, data = data[z_vec == 0, ]),
+        error = function(e) {
+          stop("interaction model failed for z=0 subgroup: ", conditionMessage(e))
+        },
+        warning = function(w) {
+          warning("interaction model warning for z=0 subgroup: ", conditionMessage(w))
+          suppressWarnings(lm(fmla_B, data = data[z_vec == 0, ]))
+        }
+      )
 
       yhat1 <- predict(fA, newdata = data)
       yhat0 <- predict(fB, newdata = data)

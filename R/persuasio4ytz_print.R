@@ -8,10 +8,6 @@ print.persuasio4ytz <- function(x, digits = 4, ...) {
   cat("\n")
   cat("Average persuasion rate for binary outcomes, binary treatments and binary instruments\n\n")
 
-  if (!is.null(x$title)) {
-    cat("Title: ", x$title, "\n\n", sep = "")
-  }
-
   cat("Outcome:    ", x$outcome, "\n", sep = "")
   cat("Treatment:  ", x$treatment, "\n", sep = "")
   cat("Instrument: ", x$instrument, "\n", sep = "")

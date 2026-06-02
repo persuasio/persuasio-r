@@ -6,9 +6,11 @@
 \usage{
 persuasio(
   est = c("apr", "lpr", "yz", "calc"),
-  varlist,
+  y,
+  z,
+  t = NULL,
+  x = NULL,
   data,
-  subset = NULL,
   ...
 )
 }
@@ -21,19 +23,17 @@ persuasio(
 \item \code{"calc"}: Average and local persuasion rate calculation from summary statistics
 }}
 
-\item{varlist}{character vector of variable names. For \code{est = "apr"},
-\code{"lpr"}, and \code{"calc"}, use \code{c(y, t, z, x, ...)} where:
-\itemize{
-\item y = binary outcome
-\item t = binary treatment
-\item z = binary instrument
-\item x = optional covariates
-}
-For \code{est = "yz"}, use \code{c(y, z, x, ...)}.}
+\item{y}{character, outcome variable name (binary 0/1)}
+
+\item{z}{character, instrument variable name (binary 0/1)}
+
+\item{t}{character, treatment variable name (binary 0/1). Required for
+\code{est = "apr"}, \code{"lpr"}, and \code{"calc"}. Defaults to
+\code{NULL}.}
+
+\item{x}{optional character, vector of covariates Defaults to \code{NULL}.}
 
 \item{data}{data.frame containing variables}
-
-\item{subset}{optional vector of row indices or logical filter}
 
 \item{...}{additional arguments passed to downstream estimators}
 }
@@ -47,52 +47,58 @@ An object of class depending on \code{est}:
 }
 }
 \description{
-Main wrapper for the \pkg{persuasio} package. Provides a
-unified entry point to all persuasion effect estimators. The function
-parses inputs, optionally subsets the data, and dispatches to the
-appropriate estimator based on \code{est}.
-
-Variables in \code{varlist} must be supplied in estimator-specific order.
-For \code{est = "apr"}, \code{"lpr"}, and \code{"calc"}, use
-\code{c(y, t, z, x, ...)}. For \code{est = "yz"}, where the treatment is
-unobserved, use \code{c(y, z, x, ...)}.
+Main wrapper for the \pkg{persuasio} package. Provides a unified
+entry point to all persuasion effect estimators. The function parses inputs
+and dispatches to the appropriate estimator based on \code{est}. The
+variables \code{y}, \code{t}, \code{z}, and \code{x} can be supplied in any
+order as explicitly named arguments. For \code{est = "apr"}, \code{"lpr"},
+and \code{"calc"}, supplying \code{y} (outcome), \code{t} (treatment), and
+\code{z} (instrument) is mandatory. For \code{est = "yz"}, where the
+treatment is unobserved, only \code{y} and \code{z} are required, while the
+treatment argument \code{t} is ignored. Optional covariates can be supplied
+to \code{x} for any estimator mode.
 }
 \details{
 This function only performs:
 \enumerate{
 \item input parsing
-\item optional subsetting
 \item method dispatch
 }
 }
 \examples{
 # Example 1: Average persuasion rate (APR) with normal inference
 persuasio(
-  est     = "apr",
-  varlist = c("voteddem_all", "readsome", "post"),
-  data    = GKB,
-  level   = 0.80,
-  method  = "normal"
+  est = "apr",
+  y = "voteddem_all",
+  t = "readsome",
+  z = "post",
+  level = 0.80,
+  method = "normal",
+  data = GKB
 )
 
 # Example 2: Local persuasion rate (LPR) with normal inference
 persuasio(
-  est     = "lpr",
-  varlist = c("voteddem_all", "readsome", "post"),
-  data    = GKB,
-  level   = 0.80,
-  method  = "normal"
+  est = "lpr",
+  y = "voteddem_all",
+  t = "readsome",
+  z = "post",
+  level = 0.80,
+  method = "normal",
+  data = GKB
 )
 
 # Example 3: Outcome-instrument bounds with covariate and bootstrap inference
 persuasio(
-  est     = "yz",
-  varlist = c("voteddem_all", "post", "MZwave2"),
-  data    = GKB,
-  level   = 0.80,
-  model   = "interaction",
-  method  = "bootstrap",
-  nboot   = 1000
+  est = "yz",
+  y = "voteddem_all",
+  z = "post",
+  x = "MZwave2",
+  level = 0.80,
+  model = "interaction",
+  method = "bootstrap",
+  nboot = 1000,
+  data = GKB
 )
 
 

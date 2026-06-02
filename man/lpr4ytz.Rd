@@ -4,20 +4,21 @@
 \alias{lpr4ytz}
 \title{Estimate the local persuasion rate}
 \usage{
-lpr4ytz(data, y, t, z, x = NULL, model = "no_interaction")
+lpr4ytz(y, t, z, x = NULL, model = "no_interaction", data)
 }
 \arguments{
-\item{data}{data.frame}
+\item{y}{character, outcome variable name (binary 0/1)}
 
-\item{y}{outcome variable (binary)}
+\item{t}{character, treatment variable name (binary 0/1)}
 
-\item{t}{treatment variable (binary)}
+\item{z}{character, instrument variable name (binary 0/1)}
 
-\item{z}{instrument variable (binary)}
+\item{x}{optional character, vector of covariates. Defaults to \code{NULL}.}
 
-\item{x}{covariates (optional character vector)}
+\item{model}{character, model specification: "no_interaction" or "interaction". Defaults
+to \code{no_interaction}.}
 
-\item{model}{"no_interaction" or "interaction"}
+\item{data}{data.frame containing variables}
 }
 \value{
 A list with:
@@ -48,29 +49,29 @@ unless \code{model = "no_interaction"} is specified.
 \examples{
 # Example 1: No covariates
 lpr4ytz(
-  data = GKB,
   y    = "voteddem_all",
   t    = "readsome",
-  z    = "post"
+  z    = "post",
+  data = GKB
 )
 
 # Example 2: With covariate (interaction model, default)
 lpr4ytz(
-  data  = GKB,
-  y     = "voteddem_all",
-  t     = "readsome",
-  z     = "post",
-  x     = "MZwave2"
-)
-
-# Example 3: With covariate (no-interaction model)
-lpr4ytz(
-  data  = GKB,
   y     = "voteddem_all",
   t     = "readsome",
   z     = "post",
   x     = "MZwave2",
-  model = "no_interaction"
+  data = GKB
+)
+
+# Example 3: With covariate (no-interaction model)
+lpr4ytz(
+  y     = "voteddem_all",
+  t     = "readsome",
+  z     = "post",
+  x     = "MZwave2",
+  model = "no_interaction",
+  data  = GKB
 )
 
 

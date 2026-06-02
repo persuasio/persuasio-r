@@ -15,18 +15,15 @@
 #'   covariates are present, analytic standard errors are unavailable and
 #'   \code{method = "bootstrap"} is required.
 #'
-#' @param data data.frame containing variables
 #' @param y character, outcome variable name (binary 0/1)
 #' @param z character, instrument variable name (binary 0/1)
-#' @param x optional character vector of covariates
+#' @param x optional character, vector of covariates. Defaults to \code{NULL}.
 #' @param model model specification: \code{"no_interaction"} or
 #'   \code{"interaction"}
 #' @param method inference method: \code{"normal"} or \code{"bootstrap"}
 #' @param level confidence level (default 0.95)
 #' @param nboot number of bootstrap replications (default 50)
-#' @param title optional title for output display
-#' @param subset optional index or logical vector for subsetting data
-#' @param seed optional random seed for bootstrap reproducibility
+#' @param data data.frame containing variables
 #'
 #' @return An object of class \code{persuasio4yz} containing:
 #' \describe{
@@ -42,7 +39,6 @@
 #'   \item{covariates}{covariates used}
 #'   \item{model}{model specification}
 #'   \item{nboot}{number of bootstrap replications (if applicable)}
-#'   \item{title}{optional title}
 #' }
 #'
 #' @details
@@ -66,54 +62,46 @@
 #' @examples
 #' # Example 1: No covariates, normal inference
 #' persuasio4yz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   z      = "post",
 #'   method = "normal",
-#'   level  = 0.80
+#'   level  = 0.80,
+#'   data   = GKB
 #' )
 #'
 #' # Example 2: No covariates, bootstrap inference
 #' persuasio4yz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   z      = "post",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' # Example 3: With covariate, interaction model, bootstrap inference
 #' persuasio4yz(
-#'   data   = GKB,
 #'   y      = "voteddem_all",
 #'   z      = "post",
 #'   x      = "MZwave2",
 #'   model  = "interaction",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000
+#'   nboot  = 1000,
+#'   data   = GKB
 #' )
 #'
 #' @export
-persuasio4yz <- function(data, y, z, x = NULL,
+persuasio4yz <- function(y, z, x = NULL,
                          model = "no_interaction",
                          method = "normal",
                          level = 0.95,
                          nboot = 50,
-                         title = NULL,
-                         subset = NULL,
-                         seed = NULL) {
+                         data) {
 
   method <- match.arg(method, c("normal", "bootstrap"))
 
-  if (!is.null(seed)) set.seed(seed)
-
-  if (!is.null(subset)) {
-    data <- data[subset, , drop = FALSE]
-  }
-
-  lb <- aprlb(data, y, z, x, model)
+  lb <- aprlb(y = y, z = z, x = x, model = model, data = data)
 
   lb_coef <- lb$lb_coef
   ub_coef <- 1
@@ -149,8 +137,7 @@ persuasio4yz <- function(data, y, z, x = NULL,
       outcome = y,
       instrument = z,
       covariates = x,
-      model = model,
-      title = title
+      model = model
     )
   }
 
@@ -163,7 +150,10 @@ persuasio4yz <- function(data, y, z, x = NULL,
     for (b in seq_len(nboot)) {
       idx <- sample(seq_len(n), size = n, replace = TRUE)
       d_b <- data[idx, , drop = FALSE]
-      lb_b <- suppressWarnings(try(aprlb(d_b, y, z, x, model), silent = TRUE))
+
+      lb_b <- suppressWarnings(try(
+        aprlb(y = y, z = z, x = x, model = model, data = d_b), silent = TRUE
+      ))
       lb_boot[b] <- if (inherits(lb_b, "try-error")) NA else lb_b$lb_coef
     }
 
@@ -182,8 +172,7 @@ persuasio4yz <- function(data, y, z, x = NULL,
       instrument = z,
       covariates = x,
       model = model,
-      nboot = nboot,
-      title = title
+      nboot = nboot
     )
   }
 
