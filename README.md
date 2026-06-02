@@ -38,7 +38,9 @@ library(persuasio)
 # Average persuasion rate (APR): normal inference
 persuasio(
   est     = "apr",
-  varlist = c("voteddem_all", "readsome", "post"),
+  y       = "voteddem_all",
+  t       = "readsome",
+  z       = "post",
   data    = GKB,
   level   = 0.80,
   method  = "normal"
@@ -62,7 +64,9 @@ persuasio(
 # Local persuasion rate (LPR): bootstrap inference
 persuasio(
   est     = "lpr",
-  varlist = c("voteddem_all", "readsome", "post"),
+  y       = "voteddem_all",
+  t       = "readsome",
+  z       = "post",
   data    = GKB,
   level   = 0.80,
   method  = "bootstrap",
@@ -80,7 +84,7 @@ persuasio(
 #> 
 #> Estimates:
 #>     LPR CI Lower CI Upper
-#>  0.8067   0.0346        1
+#>  0.8067   0.0664        1
 #> 
 #> Confidence level: 80%
 #> Bootstrap replications: 1000

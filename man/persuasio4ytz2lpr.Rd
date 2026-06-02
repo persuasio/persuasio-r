@@ -69,20 +69,21 @@ interval rather than a bound interval is returned.
 
 When covariates are absent and \code{method = "normal"}, a delta-method
 standard error from \code{\link{lpr4ytz}} is used. When covariates are
-present, analytic standard errors are unavailable and
-\code{method = "bootstrap"} is required.
+present, bootstrap inference is recommended and is required when analytical
+standard errors are unavailable, such as under \code{model = "interaction"}.
 }
 \details{
 When \code{method = "normal"}, the confidence interval is constructed as
 \deqn{\hat{\theta}_{LPR} \pm z_{\alpha/2} \cdot \widehat{se}}
 where \eqn{\widehat{se}} is the delta-method standard error returned by
 \code{\link{lpr4ytz}}. This requires \code{se} to be non-missing; if
-\code{se = NA} (which occurs when covariates are present), the normal
-method is not available and \code{method = "bootstrap"} must be used.
+\code{se = NA}, the normal method is not available and
+\code{method = "bootstrap"} must be used.
 
 When \code{method = "bootstrap"}, the confidence interval is constructed
 from empirical quantiles of bootstrap replications of the LPR estimate.
-Set \code{seed} for reproducible results.
+For reproducible bootstrap results, call \code{set.seed()} before running
+this function.
 }
 \examples{
 # Example 1: No covariates, normal inference

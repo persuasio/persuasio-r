@@ -9,6 +9,38 @@ Add new entries at the top. Format: date · function(s) · issue · status.
 
 ---
 
+## [2026-06-02] Post-PR documentation cleanup after interface refactor
+
+**Files:** `README.Rmd`, `README.md`, `vignettes/getting-started.Rmd`,
+`R/lpr4ytz.R`, `R/persuasio4ytz2lpr.R`, `R/persuasio4yz.R`,
+`man/lpr4ytz.Rd`, `man/persuasio4ytz2lpr.Rd`, `man/persuasio4yz.Rd`,
+`dev/debug-log.md`  
+**Issue:** Pull request #1 (`refactor/cleanup`) merged Sarah Chen's interface
+cleanup into `main`. The code-level changes look good and `R CMD check
+--as-cran --no-manual` passed in a temporary copy with environmental NOTEs only,
+but several user-facing documentation items need a maintainer follow-up:
+- `README.Rmd` examples still use the old `varlist = c(...)` interface, while
+  `persuasio()` now uses named `y`, `t`, `z`, and optional `x` arguments.
+- Some bootstrap examples in the vignette use `nboot = 1000` while the prose says
+  one hundred replications are used for computational efficiency.
+- The vignette has an interaction-model example whose code still uses
+  `model = "no_interaction"`.
+- `lpr4ytz` documentation describes the interaction model as the default, but
+  the function default is `model = "no_interaction"`.
+- Stale `seed` wording remains in `persuasio4ytz2lpr` and `persuasio4yz`
+  documentation even though these wrappers now rely on the caller setting the
+  external RNG state with `set.seed()`.
+
+**Status:** Fixed - `README.Rmd` now uses named arguments, `README.md` has been
+regenerated, live vignette bootstrap examples use `nboot = 100`, the vignette
+interaction example now uses `model = "interaction"`, and the opening notation
+was simplified from individual-specific `Z_i`, `T_i`, and `Y_i` to `Z`, `T`,
+and `Y`. Roxygen wording for `lpr4ytz`, `persuasio4ytz2lpr`, and
+`persuasio4yz` has been corrected, and the corresponding `man/*.Rd` files have
+been regenerated with `devtools::document()`.
+
+---
+
 ## [2026-05-29] Undocumented seed argument in persuasio4ytz
 
 **Function:** `R/persuasio4ytz.R`, `man/persuasio4ytz.Rd`  

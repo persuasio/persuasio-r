@@ -24,11 +24,11 @@ and inference on average persuasion rates (APR) and local persuasion rates
 
 The package is designed for settings with a two-stage causal structure:
 
-$$Z_i \text{ (instrument)} \rightarrow T_i \text{ (exposure)} \rightarrow Y_i \text{ (outcome)}$$
+$$Z \text{ (instrument)} \rightarrow T \text{ (exposure)} \rightarrow Y \text{ (outcome)}$$
 
-where $Z_i$ is a binary instrument, such as random assignment or policy
-eligibility; $T_i$ is actual exposure to a persuasive message, such as media
-consumption or campaign contact; and $Y_i$ is a binary behavioral outcome, such
+where $Z$ is a binary instrument, such as random assignment or policy
+eligibility; $T$ is actual exposure to a persuasive message, such as media
+consumption or campaign contact; and $Y$ is a binary behavioral outcome, such
 as voting, donating, or purchasing. For an overview of empirical settings that
 motivate persuasion estimands, see DellaVigna and Gentzkow (2010, *Annual
 Review of Economics*,
@@ -56,7 +56,7 @@ statistics are available.
   analogous to the average treatment effect (ATE), and is generally partially
   identified and reported as sharp bounds.
 - **Local Persuasion Rate (LPR)**: the persuasion rate among compliers, the
-  subpopulation for whom $Z_i$ changes $T_i$. It is analogous to the local
+  subpopulation for whom $Z$ changes $T$. It is analogous to the local
   average treatment effect (LATE) in the instrumental variables literature.
 
 ## `persuasio` TL;DR
@@ -156,7 +156,7 @@ persuasio(
   level = 0.80,
   model = "interaction",
   method = "bootstrap",
-  nboot = 1000
+  nboot = 100
 )
 ```
 
@@ -366,7 +366,7 @@ lpr4ytz(
   t = "readsome",
   z = "post",
   x = "MZwave2",
-  model = "no_interaction",
+  model = "interaction",
   data = GKB
 )
 ```
@@ -427,7 +427,7 @@ persuasio4ytz(
   z = "post",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```
@@ -448,7 +448,7 @@ persuasio4ytz(
   model = "interaction",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```
@@ -496,7 +496,7 @@ persuasio4ytz2lpr(
   z = "post",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```
@@ -516,7 +516,7 @@ persuasio4ytz2lpr(
   model = "interaction",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```
@@ -556,7 +556,7 @@ persuasio4yz(
   z = "post",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```
@@ -575,7 +575,7 @@ persuasio4yz(
   model = "interaction",
   method = "bootstrap",
   level = 0.80,
-  nboot = 1000,
+  nboot = 100,
   data = GKB
 )
 ```

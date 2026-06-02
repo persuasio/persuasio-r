@@ -68,13 +68,14 @@ covariates are present, analytic standard errors are unavailable and
 }
 \details{
 When \code{method = "normal"}, the function applies a Stoye (2009)-style
-correction. If either standard errors from \code{\link{aprlb}} or
-\code{\link{aprub}} is \code{NA} (which occurs when covariates are present),
-use \code{method = "bootstrap"} instead.
+correction using the analytical standard error for the lower-bound estimator
+returned by \code{\link{aprlb}}. The upper bound is fixed at 1. If the lower
+bound standard error is unavailable, use \code{method = "bootstrap"} instead.
 
 When \code{method = "bootstrap"}, the function constructs the confidence
 interval from empirical quantiles of jointly resampled lower and upper bound
-estimates. Set \code{seed} for reproducible results.
+estimates. For reproducible bootstrap results, call \code{set.seed()} before
+running this function.
 }
 \examples{
 # Example 1: No covariates, normal inference

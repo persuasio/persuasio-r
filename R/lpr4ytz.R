@@ -3,10 +3,10 @@
 #' @description Estimates the local persuasion rate (LPR) for compliers. Requires a
 #'   binary outcome \code{y}, a binary treatment \code{t}, and a binary
 #'   instrument \code{z}. Covariates \code{x} are optional. When covariates
-#'   are absent, the function returns standard errors and confidence intervals. When
-#'   covariates are present, separate models are fit on the \code{z = 1} and
-#'   \code{z = 0} subgroups; standard errors are not available in this case
-#'   unless \code{model = "no_interaction"} is specified.
+#'   are absent, the function returns standard errors and confidence intervals.
+#'   With covariates, \code{model = "no_interaction"} fits one regression with
+#'   \code{z} and \code{x}; \code{model = "interaction"} fits separate models by
+#'   instrument group and does not report analytical standard errors.
 #'
 #' @param y character, outcome variable name (binary 0/1)
 #' @param t character, treatment variable name (binary 0/1)
@@ -47,7 +47,7 @@
 #'   data = GKB
 #' )
 #'
-#' # Example 2: With covariate (interaction model, default)
+#' # Example 2: With covariate, no-interaction model
 #' lpr4ytz(
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
@@ -56,13 +56,13 @@
 #'   data = GKB
 #' )
 #'
-#' # Example 3: With covariate (no-interaction model)
+#' # Example 3: With covariate, interaction model
 #' lpr4ytz(
 #'   y     = "voteddem_all",
 #'   t     = "readsome",
 #'   z     = "post",
 #'   x     = "MZwave2",
-#'   model = "no_interaction",
+#'   model = "interaction",
 #'   data  = GKB
 #' )
 #'
