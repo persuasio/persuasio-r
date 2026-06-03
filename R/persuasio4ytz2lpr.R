@@ -83,7 +83,7 @@
 #'   z      = "post",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000,
+#'   nboot  = 100,
 #'   data   = GKB
 #' )
 #'
@@ -96,7 +96,7 @@
 #'   model  = "interaction",
 #'   method = "bootstrap",
 #'   level  = 0.80,
-#'   nboot  = 1000,
+#'   nboot  = 100,
 #'   data   = GKB
 #' )
 #'

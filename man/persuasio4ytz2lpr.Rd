@@ -103,7 +103,7 @@ persuasio4ytz2lpr(
   z      = "post",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000,
+  nboot  = 100,
   data   = GKB
 )
 
@@ -116,7 +116,7 @@ persuasio4ytz2lpr(
   model  = "interaction",
   method = "bootstrap",
   level  = 0.80,
-  nboot  = 1000,
+  nboot  = 100,
   data   = GKB
 )
 
