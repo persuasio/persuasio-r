@@ -13,6 +13,10 @@
 
 \item{...}{unused}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing
+a formatted summary of the average persuasion rate estimate.
+}
 \description{
 Print method for persuasio4yz
 }

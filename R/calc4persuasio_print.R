@@ -2,6 +2,9 @@
 #' @param x object of class "calc4persuasio"
 #' @param digits number of decimal places to display (default is 4)
 #' @param ... unused
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the average and local persuasion rate, including the
+#'   estimate, standard error, and confidence interval.
 #' @export
 print.calc4persuasio <- function(x, digits = 4, ...) {
 

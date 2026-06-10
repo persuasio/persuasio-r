@@ -2,6 +2,9 @@
 #' @param x object of class "lpr4ytz"
 #' @param digits number of decimal places to display (default is 4)
 #' @param ... unused
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the local persuasion rate estimate, standard error,
+#'   and confidence interval.
 #' @export
 print.lpr4ytz <- function(x, digits = 4, ...) {
 

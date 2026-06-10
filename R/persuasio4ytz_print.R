@@ -2,6 +2,8 @@
 #' @param x object of class "persuasio4ytz"
 #' @param digits number of decimal places to display (default is 4)
 #' @param ... unused
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the average persuasion rate estimate.
 #' @export
 print.persuasio4ytz <- function(x, digits = 4, ...) {
 
