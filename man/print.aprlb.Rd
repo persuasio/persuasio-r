@@ -13,6 +13,11 @@
 
 \item{...}{unused}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing
+a formatted summary of the lower bound estimate on the average persuasion
+rate, including the estimate, standard error, and confidence interval.
+}
 \description{
 Print method for aprlb objects
 }

@@ -13,6 +13,11 @@
 
 \item{...}{unused}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing a
+formatted summary of the average and local persuasion rate, including the
+estimate, standard error, and confidence interval.
+}
 \description{
 Print method for calc4persuasio
 }

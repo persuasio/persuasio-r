@@ -2,6 +2,9 @@
 #' @param x object of class "aprlb"
 #' @param digits number of decimal places to display (default is 4)
 #' @param ... unused
+#' @return Invisibly returns \code{x}. Called for its side effect of printing
+#'   a formatted summary of the lower bound estimate on the average persuasion
+#'   rate, including the estimate, standard error, and confidence interval.
 #' @export
 print.aprlb <- function(x, digits = 4, ...) {
   cat("\n")
