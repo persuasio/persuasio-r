@@ -15,8 +15,8 @@
 }
 \value{
 Invisibly returns \code{x}. Called for its side effect of printing a
-formatted summary of the average and local persuasion rate, including the
-estimate, standard error, and confidence interval.
+formatted summary of APR and LPR bounds computed from summary statistics,
+together with the input probabilities.
 }
 \description{
 Print method for calc4persuasio
